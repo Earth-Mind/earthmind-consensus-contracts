@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract EarthMindRegistry {
+contract EarthMindRegistryL2 {
     mapping(address protocol => bool isRegistered) public protocols;
     mapping(address miner => bool isRegistered) public miners;
     mapping(address validator => bool isRegistered) public validators;
@@ -13,9 +13,13 @@ contract EarthMindRegistry {
     event ValidatorRegistered(address indexed Validator);
     event ValidatorUnregistered(address indexed Validator);
 
+    constructor(address _l1Hub) {
+        l1Hub = _l1Hub;
+    }
     ///////////////////////////////////////////////////////////////////////////
     //  EXTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function registerProtocol() external {
         _validateProtocolRegistration(msg.sender);
 

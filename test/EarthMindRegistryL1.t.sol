@@ -2,10 +2,11 @@
 pragma solidity 0.8.19;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {EarthMindRegistry} from "../src/EarthMindRegistry.sol";
+import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
+import {Configuration} from "../config/Configuration.sol";
 
-contract EarthMindRegistryTest is Test {
-    EarthMindRegistry public instance;
+contract EarthMindRegistryL1Test is Test {
+    EarthMindRegistryL1 public earthMindL1;
 
     event ProtocolRegistered(address indexed protocol);
     event ProtocolUnregistered(address indexed protocol);
@@ -15,7 +16,18 @@ contract EarthMindRegistryTest is Test {
     event ValidatorUnregistered(address indexed Validator);
 
     function setUp() public {
-        instance = new EarthMindRegistry();
+        eartMindL2 = new EarthMindRegistryL2(
+            Configuration.AXELAR_GATEWAY,
+            Configuration.AXELAR_GAS_SERVICE,
+            Configuration.DESTINATION_CHAIN,
+            Configuration.DESTINATION_ADDRESS
+        );
+        earthMindL1 = new EarthMindRegistryL1(
+            Configuration.AXELAR_GATEWAY,
+            Configuration.AXELAR_GAS_SERVICE,
+            Configuration.DESTINATION_CHAIN,
+
+        );
     }
 
     function test_ProtocolRegister() public {
@@ -23,21 +35,21 @@ contract EarthMindRegistryTest is Test {
 
         emit ProtocolRegistered(address(this));
 
-        instance.registerProtocol();
+        earthMindL1.registerProtocol();
 
-        assertEq(instance.protocols(address(this)), true);
+        assertEq(earthMindL1.protocols(address(this)), true);
     }
 
     function test_ProtocolUnRegister() public {
-        instance.registerProtocol();
+        earthMindL1.registerProtocol();
 
         vm.expectEmit(true, false, false, true);
 
         emit ProtocolUnregistered(address(this));
 
-        instance.unRegisterProtocol();
+        earthMindL1.unRegisterProtocol();
 
-        assertEq(instance.protocols(address(this)), false);
+        assertEq(earthMindL1.protocols(address(this)), false);
     }
 
     function test_MinerRegister() public {
@@ -45,21 +57,21 @@ contract EarthMindRegistryTest is Test {
 
         emit MinerRegistered(address(this));
 
-        instance.registerMiner();
+        earthMindL1.registerMiner();
 
-        assertEq(instance.miners(address(this)), true);
+        assertEq(earthMindL1.miners(address(this)), true);
     }
 
     function test_MinerUnRegister() public {
-        instance.registerMiner();
+        earthMindL1.registerMiner();
 
         vm.expectEmit(true, false, false, true);
 
         emit MinerUnregistered(address(this));
 
-        instance.unRegisterMiner();
+        earthMindL1.unRegisterMiner();
 
-        assertEq(instance.miners(address(this)), false);
+        assertEq(earthMindL1.miners(address(this)), false);
     }
 
     function test_ValidatorRegister() public {
@@ -67,20 +79,20 @@ contract EarthMindRegistryTest is Test {
 
         emit ValidatorRegistered(address(this));
 
-        instance.registerValidator();
+        earthMindL1.registerValidator();
 
-        assertEq(instance.validators(address(this)), true);
+        assertEq(earthMindL1.validators(address(this)), true);
     }
 
     function test_ValidatorUnRegister() public {
-        instance.registerValidator();
+        earthMindL1.registerValidator();
 
         vm.expectEmit(true, false, false, true);
 
         emit ValidatorUnregistered(address(this));
 
-        instance.unRegisterValidator();
+        earthMindL1.unRegisterValidator();
 
-        assertEq(instance.validators(address(this)), false);
+        assertEq(earthMindL1.validators(address(this)), false);
     }
 }
