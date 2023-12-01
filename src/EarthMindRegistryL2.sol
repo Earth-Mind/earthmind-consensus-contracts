@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract EarthMindRegistryL2 {
+import {CrossChainSetup} from "./CrossChainSetup.sol";
+
+contract EarthMindRegistryL2 is AxelarExecutable {
+    address public immutable registryL1;
+
+    string public DESTINATION_CHAIN;
+    string public DESTINATION_ADDRESS;
+
     mapping(address protocol => bool isRegistered) public protocols;
     mapping(address miner => bool isRegistered) public miners;
     mapping(address validator => bool isRegistered) public validators;
@@ -12,8 +19,9 @@ contract EarthMindRegistryL2 {
     event MinerUnregistered(address indexed Miner);
     event ValidatorRegistered(address indexed Validator);
     event ValidatorUnregistered(address indexed Validator);
+    event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
 
-    constructor(address _l1Hub) {
+    constructor(CrossChainSetup _setup) {
         l1Hub = _l1Hub;
     }
     ///////////////////////////////////////////////////////////////////////////
@@ -105,5 +113,14 @@ contract EarthMindRegistryL2 {
         require(validators[validator], "Validator not registered");
 
         // TODO: implement logic
+    }
+
+    function _execute(string calldata sourceChain, string calldata sourceAddress, bytes calldata payload)
+        internal
+        override
+    {
+        (uint256 nonce, bytes memory payloadActual) = abi.decode(payload, (uint256, bytes));
+        gateway.callContract(sourceChain, sourceAddress, abi.encode(nonce));
+        _executePostAck(sourceChain, sourceAddress, payloadActual);
     }
 }

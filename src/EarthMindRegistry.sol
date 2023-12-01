@@ -8,7 +8,7 @@ import {CrossChainSetup} from "./CrossChainSetup.sol";
 
 import {NoGasPaymentProvided} from "./Errors.sol";
 
-contract EarthMindRegistryL1 is AxelarExecutable {
+abstract contract EarthMindRegistry is AxelarExecutable {
     IAxelarGasService public immutable gasReceiver;
 
     string public DESTINATION_CHAIN;
@@ -24,18 +24,23 @@ contract EarthMindRegistryL1 is AxelarExecutable {
     event MinerUnregistered(address indexed Miner);
     event ValidatorRegistered(address indexed Validator);
     event ValidatorUnregistered(address indexed Validator);
-    event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
+    // event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
 
     constructor(CrossChainSetup.SetupData _setup, address _gateway, address _gasService) AxelarExecutable(_gateway) {
-        CrossChainSetup.SetupData setupData = _setup.getSetupData();
-        DESTINATION_CHAIN = setupData.destinationChain;
-        DESTINATION_ADDRESS = setupData.registryL2;
         gasReceiver = IAxelarGasService(_gasService);
+
+        CrossChainSetup.SetupData setupData = _setup.getSetupData();
+        _setupData(setupData);
     }
 
+    function _setupData(CrossChainSetup.SetupData setupData) internal view virtual {
+        DESTINATION_CHAIN = setupData.destinationChain;
+        DESTINATION_ADDRESS = setupData.registryL2;
+    }
     ///////////////////////////////////////////////////////////////////////////
     //  EXTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function registerProtocol() external {
         _validateProtocolRegistration(msg.sender);
 
@@ -123,17 +128,17 @@ contract EarthMindRegistryL1 is AxelarExecutable {
         // TODO: implement logic
     }
 
-    function sendMessage(bytes memory _payload) internal {
-        if (msg.value == 0) {
-            revert NoGasPaymentProvided();
-        }
+    // function sendMessage(bytes memory _payload) internal {
+    //     if (msg.value == 0) {
+    //         revert NoGasPaymentProvided();
+    //     }
 
-        gasReceiver.payNativeGasForContractCall{value: msg.value}(
-            address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender
-        );
+    //     gasReceiver.payNativeGasForContractCall{value: msg.value}(
+    //         address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender
+    //     );
 
-        gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
+    //     gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
 
-        emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender);
-    }
+    //     emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender);
+    // }
 }
