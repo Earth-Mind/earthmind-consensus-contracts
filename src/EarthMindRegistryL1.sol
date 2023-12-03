@@ -1,139 +1,131 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/executable/AxelarExecutable.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/interfaces/IAxelarGasService.sol";
-
+import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
 
 import {NoGasPaymentProvided} from "./Errors.sol";
 
-contract EarthMindRegistryL1 is AxelarExecutable {
-    IAxelarGasService public immutable gasReceiver;
+contract EarthMindRegistryL1 is EarthMindRegistry {
+    constructor(CrossChainSetup.SetupData _setup, address _gateway, address _gasService)
+        EarthMindRegistry(_setup, _gateway, _gasService)
+    {}
 
-    string public DESTINATION_CHAIN;
-    string public DESTINATION_ADDRESS;
-
-    mapping(address protocol => bool isRegistered) public protocols;
-    mapping(address miner => bool isRegistered) public miners;
-    mapping(address validator => bool isRegistered) public validators;
-
-    event ProtocolRegistered(address indexed protocol);
-    event ProtocolUnregistered(address indexed protocol);
-    event MinerRegistered(address indexed Miner);
-    event MinerUnregistered(address indexed Miner);
-    event ValidatorRegistered(address indexed Validator);
-    event ValidatorUnregistered(address indexed Validator);
-    event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
-
-    constructor(CrossChainSetup.SetupData _setup, address _gateway, address _gasService) AxelarExecutable(_gateway) {
-        CrossChainSetup.SetupData setupData = _setup.getSetupData();
+    ///////////////////////////////////////////////////////////////////////////
+    //  OVERRIDE FUNCTIONS
+    ///////////////////////////////////////////////////////////////////////////
+    function _setupData(CrossChainSetup.SetupData setupData) internal view override {
         DESTINATION_CHAIN = setupData.destinationChain;
         DESTINATION_ADDRESS = setupData.registryL2;
-        gasReceiver = IAxelarGasService(_gasService);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     //  EXTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function registerProtocol() external {
-        _validateProtocolRegistration(msg.sender);
+        _validateProtocolRegistration(_protocol);
 
-        protocols[msg.sender] = true;
+        super._registerProtocol(msg.sender);
 
-        emit ProtocolRegistered(msg.sender);
+        _bridge(abi.encodeWithSignature("registerProtocol(address)", msg.sender), msg.sender);
     }
 
     function unRegisterProtocol() external {
-        _validateProtocolUnRegistration(msg.sender);
+        _validateProtocolUnRegistration(_protocol);
 
-        protocols[msg.sender] = false;
+        super._unRegisterProtocol(msg.sender);
 
-        emit ProtocolUnregistered(msg.sender);
+        _bridge(abi.encodeWithSignature("unRegisterProtocol(address)", msg.sender), msg.sender);
     }
 
     function registerMiner() external {
         _validateMinerRegistration(msg.sender);
 
-        miners[msg.sender] = true;
+        super._registerMiner(msg.sender);
 
-        emit MinerRegistered(msg.sender);
+        _bridge(abi.encodeWithSignature("registerMiner(address)", msg.sender), msg.sender);
     }
 
     function unRegisterMiner() external {
         _validateMinerUnRegistration(msg.sender);
 
-        miners[msg.sender] = false;
+        super._unRegisterMiner(msg.sender);
 
-        emit MinerUnregistered(msg.sender);
+        _bridge(abi.encodeWithSignature("unRegisterMiner(address)", msg.sender), msg.sender);
     }
 
     function registerValidator() external {
         _validateValidatorRegistration(msg.sender);
 
-        validators[msg.sender] = true;
+        super._registerValidator(msg.sender);
 
-        emit ValidatorRegistered(msg.sender);
+        _bridge(abi.encodeWithSignature("registerValidator(address)", msg.sender), msg.sender);
     }
 
     function unRegisterValidator() external {
         _validateValidatorUnRegistration(msg.sender);
 
-        validators[msg.sender] = false;
+        super._unRegisterValidator(msg.sender);
 
-        emit ValidatorUnregistered(msg.sender);
+        _bridge(abi.encodeWithSignature("unRegisterValidator(address)", msg.sender), msg.sender);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    //  INTERNAL FUNCTIONS
+    //  VALIDATION FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function _validateProtocolRegistration(address protocol) internal view {
         require(!protocols[protocol], "Protocol already registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
     function _validateProtocolUnRegistration(address protocol) internal view {
         require(protocols[protocol], "Protocol not registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
     function _validateMinerRegistration(address miner) internal view {
         require(!miners[miner], "Miner already registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
     function _validateMinerUnRegistration(address miner) internal view {
         require(miners[miner], "Miner no registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
     function _validateValidatorRegistration(address validator) internal view {
         require(!validators[validator], "Validator already registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
     function _validateValidatorUnRegistration(address validator) internal view {
         require(validators[validator], "Validator not registered");
 
-        // TODO: implement logic
+        // TODO: implement logic and increase validation conditions
     }
 
-    function sendMessage(bytes memory _payload) internal {
+    ///////////////////////////////////////////////////////////////////////////
+    //  MESSAGING FUNCTIONS
+    ///////////////////////////////////////////////////////////////////////////
+
+    function _bridge(bytes memory _payload, address _sender) internal {
         if (msg.value == 0) {
             revert NoGasPaymentProvided();
         }
 
         gasReceiver.payNativeGasForContractCall{value: msg.value}(
-            address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender
+            address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender
         );
 
         gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
 
-        emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender);
+        emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender);
     }
 }

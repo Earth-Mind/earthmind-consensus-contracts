@@ -33,112 +33,49 @@ abstract contract EarthMindRegistry is AxelarExecutable {
         _setupData(setupData);
     }
 
-    function _setupData(CrossChainSetup.SetupData setupData) internal view virtual {
-        DESTINATION_CHAIN = setupData.destinationChain;
-        DESTINATION_ADDRESS = setupData.registryL2;
-    }
     ///////////////////////////////////////////////////////////////////////////
-    //  EXTERNAL FUNCTIONS
+    //  OVERRIDE FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
 
-    function registerProtocol() external {
-        _validateProtocolRegistration(msg.sender);
-
-        protocols[msg.sender] = true;
-
-        emit ProtocolRegistered(msg.sender);
-    }
-
-    function unRegisterProtocol() external {
-        _validateProtocolUnRegistration(msg.sender);
-
-        protocols[msg.sender] = false;
-
-        emit ProtocolUnregistered(msg.sender);
-    }
-
-    function registerMiner() external {
-        _validateMinerRegistration(msg.sender);
-
-        miners[msg.sender] = true;
-
-        emit MinerRegistered(msg.sender);
-    }
-
-    function unRegisterMiner() external {
-        _validateMinerUnRegistration(msg.sender);
-
-        miners[msg.sender] = false;
-
-        emit MinerUnregistered(msg.sender);
-    }
-
-    function registerValidator() external {
-        _validateValidatorRegistration(msg.sender);
-
-        validators[msg.sender] = true;
-
-        emit ValidatorRegistered(msg.sender);
-    }
-
-    function unRegisterValidator() external {
-        _validateValidatorUnRegistration(msg.sender);
-
-        validators[msg.sender] = false;
-
-        emit ValidatorUnregistered(msg.sender);
-    }
+    function _setupData(CrossChainSetup.SetupData setupData) internal view virtual;
 
     ///////////////////////////////////////////////////////////////////////////
     //  INTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
-    function _validateProtocolRegistration(address protocol) internal view {
-        require(!protocols[protocol], "Protocol already registered");
 
-        // TODO: implement logic
+    function _registerProtocol(address _protocol) internal {
+        protocols[_protocol] = true;
+
+        emit ProtocolRegistered(_protocol);
     }
 
-    function _validateProtocolUnRegistration(address protocol) internal view {
-        require(protocols[protocol], "Protocol not registered");
+    function _unRegisterProtocol(address _protocol) internal {
+        protocols[_protocol] = false;
 
-        // TODO: implement logic
+        emit ProtocolUnregistered(_protocol);
     }
 
-    function _validateMinerRegistration(address miner) internal view {
-        require(!miners[miner], "Miner already registered");
+    function _registerMiner(address _miner) internal {
+        miners[_miner] = true;
 
-        // TODO: implement logic
+        emit MinerRegistered(_miner);
     }
 
-    function _validateMinerUnRegistration(address miner) internal view {
-        require(miners[miner], "Miner no registered");
+    function _unRegisterMiner(address _miner) internal {
+        miners[_miner] = false;
 
-        // TODO: implement logic
+        emit MinerUnregistered(_miner);
     }
 
-    function _validateValidatorRegistration(address validator) internal view {
-        require(!validators[validator], "Validator already registered");
+    function _registerValidator(address _validator) internal {
+        validators[_validator] = true;
 
-        // TODO: implement logic
+        emit ValidatorRegistered(_validator);
     }
 
-    function _validateValidatorUnRegistration(address validator) internal view {
-        require(validators[validator], "Validator not registered");
+    function _unRegisterValidator(address _validator) internal {
+        validators[_validator] = false;
 
-        // TODO: implement logic
+        emit ValidatorUnregistered(_validator);
     }
-
-    // function sendMessage(bytes memory _payload) internal {
-    //     if (msg.value == 0) {
-    //         revert NoGasPaymentProvided();
-    //     }
-
-    //     gasReceiver.payNativeGasForContractCall{value: msg.value}(
-    //         address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender
-    //     );
-
-    //     gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
-
-    //     emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, msg.sender);
-    // }
 }

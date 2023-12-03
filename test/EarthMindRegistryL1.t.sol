@@ -3,11 +3,13 @@ pragma solidity 0.8.19;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
+import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
 import {CrosschainSetup} from "../src/CrosschainSetup.sol";
 import {Configuration} from "../config/Configuration.sol";
 
 contract EarthMindRegistryL1Test is Test {
     EarthMindRegistryL1 internal earthMindL1;
+    EarthMindRegistryL2 internal earthMindL2;
     CrosschainSetup internal crosschainSetup;
 
     event ProtocolRegistered(address indexed protocol);
@@ -19,9 +21,21 @@ contract EarthMindRegistryL1Test is Test {
 
     function setUp() public {
         crosschainSetup = new CrosschainSetup();
-        crosschainSetup.setup(Configuration.SOURCE_CHAIN, Configuration.DESTINATION_CHAIN, address(this), address(this));
+
+        // calculate the address of the L1 contract
+        address l1Address = address(this);
+
+        // calculate the address of the L2 contract
+        address l2Address = address(this);
+
+        // setup the crosschain setup contract
+        crosschainSetup.setup(Configuration.SOURCE_CHAIN, Configuration.DESTINATION_CHAIN, l1Address, l2Address);
 
         earthMindL1 = new EarthMindRegistryL1(
+            crosschainSetup
+        );
+
+        earthMindL2 = new EarthMindRegistryL2(
             crosschainSetup
         );
     }
