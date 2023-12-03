@@ -24,20 +24,19 @@ abstract contract EarthMindRegistry is AxelarExecutable {
     event MinerUnregistered(address indexed Miner);
     event ValidatorRegistered(address indexed Validator);
     event ValidatorUnregistered(address indexed Validator);
-    // event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
+    event ContractCallSent(string destinationChain, string contractAddress, bytes payload, address sender);
 
-    constructor(CrossChainSetup.SetupData _setup, address _gateway, address _gasService) AxelarExecutable(_gateway) {
+    constructor(CrossChainSetup _setup, address _gateway, address _gasService) AxelarExecutable(_gateway) {
         gasReceiver = IAxelarGasService(_gasService);
 
-        CrossChainSetup.SetupData setupData = _setup.getSetupData();
-        _setupData(setupData);
+        _setupData(_setup.getSetupData());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     //  OVERRIDE FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
 
-    function _setupData(CrossChainSetup.SetupData setupData) internal view virtual;
+    function _setupData(CrossChainSetup.SetupData memory setupData) internal virtual;
 
     ///////////////////////////////////////////////////////////////////////////
     //  INTERNAL FUNCTIONS

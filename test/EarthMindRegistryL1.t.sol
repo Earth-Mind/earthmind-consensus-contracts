@@ -4,13 +4,13 @@ pragma solidity 0.8.19;
 import {Test, console2} from "forge-std/Test.sol";
 import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
-import {CrosschainSetup} from "../src/CrosschainSetup.sol";
+import {CrossChainSetup} from "../src/CrossChainSetup.sol";
 import {Configuration} from "../config/Configuration.sol";
 
 contract EarthMindRegistryL1Test is Test {
     EarthMindRegistryL1 internal earthMindL1;
     EarthMindRegistryL2 internal earthMindL2;
-    CrosschainSetup internal crosschainSetup;
+    CrossChainSetup internal crosschainSetup;
 
     event ProtocolRegistered(address indexed protocol);
     event ProtocolUnregistered(address indexed protocol);
@@ -20,7 +20,7 @@ contract EarthMindRegistryL1Test is Test {
     event ValidatorUnregistered(address indexed Validator);
 
     function setUp() public {
-        crosschainSetup = new CrosschainSetup();
+        crosschainSetup = new CrossChainSetup();
 
         // calculate the address of the L1 contract
         address l1Address = address(this);
@@ -32,11 +32,11 @@ contract EarthMindRegistryL1Test is Test {
         crosschainSetup.setup(Configuration.SOURCE_CHAIN, Configuration.DESTINATION_CHAIN, l1Address, l2Address);
 
         earthMindL1 = new EarthMindRegistryL1(
-            crosschainSetup
+            crosschainSetup, Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE
         );
 
         earthMindL2 = new EarthMindRegistryL2(
-            crosschainSetup
+            crosschainSetup,Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE
         );
     }
 

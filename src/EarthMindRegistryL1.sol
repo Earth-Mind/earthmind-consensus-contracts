@@ -1,22 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+import {Strings} from "@openzeppelin/utils/Strings.sol";
+
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
 
 import {NoGasPaymentProvided} from "./Errors.sol";
 
 contract EarthMindRegistryL1 is EarthMindRegistry {
-    constructor(CrossChainSetup.SetupData _setup, address _gateway, address _gasService)
+    constructor(CrossChainSetup _setup, address _gateway, address _gasService)
         EarthMindRegistry(_setup, _gateway, _gasService)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
     //  OVERRIDE FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
-    function _setupData(CrossChainSetup.SetupData setupData) internal view override {
+    function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
         DESTINATION_CHAIN = setupData.destinationChain;
-        DESTINATION_ADDRESS = setupData.registryL2;
+        DESTINATION_ADDRESS = Strings.toHexString(setupData.registryL2);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -24,7 +26,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
     ///////////////////////////////////////////////////////////////////////////
 
     function registerProtocol() external {
-        _validateProtocolRegistration(_protocol);
+        _validateProtocolRegistration(msg.sender);
 
         super._registerProtocol(msg.sender);
 
@@ -32,7 +34,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
     }
 
     function unRegisterProtocol() external {
-        _validateProtocolUnRegistration(_protocol);
+        _validateProtocolUnRegistration(msg.sender);
 
         super._unRegisterProtocol(msg.sender);
 
