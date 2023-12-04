@@ -25,7 +25,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
     //  EXTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
 
-    function registerProtocol() external {
+    function registerProtocol() external payable {
         _validateProtocolRegistration(msg.sender);
 
         super._registerProtocol(msg.sender);
@@ -33,7 +33,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
         _bridge(abi.encodeWithSignature("registerProtocol(address)", msg.sender), msg.sender);
     }
 
-    function unRegisterProtocol() external {
+    function unRegisterProtocol() external payable {
         _validateProtocolUnRegistration(msg.sender);
 
         super._unRegisterProtocol(msg.sender);
@@ -41,7 +41,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
         _bridge(abi.encodeWithSignature("unRegisterProtocol(address)", msg.sender), msg.sender);
     }
 
-    function registerMiner() external {
+    function registerMiner() external payable {
         _validateMinerRegistration(msg.sender);
 
         super._registerMiner(msg.sender);
@@ -49,7 +49,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
         _bridge(abi.encodeWithSignature("registerMiner(address)", msg.sender), msg.sender);
     }
 
-    function unRegisterMiner() external {
+    function unRegisterMiner() external payable {
         _validateMinerUnRegistration(msg.sender);
 
         super._unRegisterMiner(msg.sender);
@@ -57,7 +57,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
         _bridge(abi.encodeWithSignature("unRegisterMiner(address)", msg.sender), msg.sender);
     }
 
-    function registerValidator() external {
+    function registerValidator() external payable {
         _validateValidatorRegistration(msg.sender);
 
         super._registerValidator(msg.sender);
@@ -65,7 +65,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
         _bridge(abi.encodeWithSignature("registerValidator(address)", msg.sender), msg.sender);
     }
 
-    function unRegisterValidator() external {
+    function unRegisterValidator() external payable {
         _validateValidatorUnRegistration(msg.sender);
 
         super._unRegisterValidator(msg.sender);

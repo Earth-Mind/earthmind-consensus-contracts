@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Test, console2} from "forge-std/Test.sol";
+// import { console2} from "forge-std/Test.sol";
 import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "../src/CrossChainSetup.sol";
-import {Configuration} from "../config/Configuration.sol";
 
-contract EarthMindRegistryL1Test is Test {
-    EarthMindRegistryL1 internal earthMindL1;
-    EarthMindRegistryL2 internal earthMindL2;
-    CrossChainSetup internal crosschainSetup;
+import {BaseRegistryTest} from "./BaseRegistryTest.sol";
 
+contract EarthMindRegistryL1Test is BaseRegistryTest {
     event ProtocolRegistered(address indexed protocol);
     event ProtocolUnregistered(address indexed protocol);
     event MinerRegistered(address indexed Miner);
@@ -20,24 +17,7 @@ contract EarthMindRegistryL1Test is Test {
     event ValidatorUnregistered(address indexed Validator);
 
     function setUp() public {
-        crosschainSetup = new CrossChainSetup();
-
-        // calculate the address of the L1 contract
-        address l1Address = address(this);
-
-        // calculate the address of the L2 contract
-        address l2Address = address(this);
-
-        // setup the crosschain setup contract
-        crosschainSetup.setup(Configuration.SOURCE_CHAIN, Configuration.DESTINATION_CHAIN, l1Address, l2Address);
-
-        earthMindL1 = new EarthMindRegistryL1(
-            crosschainSetup, Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE
-        );
-
-        earthMindL2 = new EarthMindRegistryL2(
-            crosschainSetup,Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE
-        );
+        _setUp();
     }
 
     function test_ProtocolRegister() public {
@@ -45,7 +25,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit ProtocolRegistered(address(this));
 
-        earthMindL1.registerProtocol();
+        earthMindL1.registerProtocol{value: 1 ether}();
 
         assertEq(earthMindL1.protocols(address(this)), true);
     }
@@ -57,7 +37,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit ProtocolUnregistered(address(this));
 
-        earthMindL1.unRegisterProtocol();
+        earthMindL1.unRegisterProtocol{value: 1 ether}();
 
         assertEq(earthMindL1.protocols(address(this)), false);
     }
@@ -67,7 +47,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit MinerRegistered(address(this));
 
-        earthMindL1.registerMiner();
+        earthMindL1.registerMiner{value: 1 ether}();
 
         assertEq(earthMindL1.miners(address(this)), true);
     }
@@ -79,7 +59,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit MinerUnregistered(address(this));
 
-        earthMindL1.unRegisterMiner();
+        earthMindL1.unRegisterMiner{value: 1 ether}();
 
         assertEq(earthMindL1.miners(address(this)), false);
     }
@@ -89,7 +69,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit ValidatorRegistered(address(this));
 
-        earthMindL1.registerValidator();
+        earthMindL1.registerValidator{value: 1 ether}();
 
         assertEq(earthMindL1.validators(address(this)), true);
     }
@@ -101,7 +81,7 @@ contract EarthMindRegistryL1Test is Test {
 
         emit ValidatorUnregistered(address(this));
 
-        earthMindL1.unRegisterValidator();
+        earthMindL1.unRegisterValidator{value: 1 ether}();
 
         assertEq(earthMindL1.validators(address(this)), false);
     }
