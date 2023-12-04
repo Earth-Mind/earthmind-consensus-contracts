@@ -6,15 +6,15 @@ import "./Account.sol";
 contract Validator is Account {
     constructor(string memory _name, Vm _vm) Account(_name, _vm) {}
 
-    function registerValidator() external {
+    function registerValidator() external payable {
         vm.prank(addr);
-        earthMindRegistryL1Instance.registerValidator();
+        earthMindRegistryL1Instance.registerValidator{value: msg.value}();
         _refreshBalances();
     }
 
-    function unRegisterValidator() external {
+    function unRegisterValidator() external payable {
         vm.prank(addr);
-        earthMindRegistryL1Instance.unRegisterValidator();
+        earthMindRegistryL1Instance.unRegisterValidator{value: msg.value}();
         _refreshBalances();
     }
 }

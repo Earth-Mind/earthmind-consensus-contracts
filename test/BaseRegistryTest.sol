@@ -6,6 +6,7 @@ import "./BaseTest.sol";
 import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "../src/CrossChainSetup.sol";
+import {EarthMindToken} from "../src/EarthMindToken.sol";
 import {Configuration} from "../config/Configuration.sol";
 
 contract BaseRegistryTest is BaseTest {
@@ -13,15 +14,22 @@ contract BaseRegistryTest is BaseTest {
     EarthMindRegistryL1 internal earthMindL1;
     EarthMindRegistryL2 internal earthMindL2;
     CrossChainSetup internal crosschainSetup;
+    EarthMindToken internal earthMindTokenInstance;
 
     // Accounts
     Validator internal validator1;
     Protocol internal protocol1;
     Miner internal miner1;
 
+    address internal DEPLOYER = vm.addr(1234);
+
     function _setUp() internal {
         _setupAccounts();
         _deploy();
+
+        miner1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
+        validator1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
+        protocol1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
     }
 
     function _setupAccounts() private {
@@ -31,6 +39,8 @@ contract BaseRegistryTest is BaseTest {
     }
 
     function _deploy() private {
+        vm.startPrank(DEPLOYER);
+        earthMindTokenInstance = new EarthMindToken();
         crosschainSetup = new CrossChainSetup();
 
         // calculate the address of the L1 contract
@@ -49,5 +59,6 @@ contract BaseRegistryTest is BaseTest {
         earthMindL2 = new EarthMindRegistryL2(
             crosschainSetup,Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE
         );
+        vm.stopPrank();
     }
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-// import { console2} from "forge-std/Test.sol";
 import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "../src/CrossChainSetup.sol";
@@ -23,66 +22,66 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
     function test_ProtocolRegister() public {
         vm.expectEmit(true, false, false, true);
 
-        emit ProtocolRegistered(address(this));
+        emit ProtocolRegistered(protocol1.addr());
 
-        earthMindL1.registerProtocol{value: 1 ether}();
+        protocol1.registerProtocol{value: 1 ether}();
 
-        assertEq(earthMindL1.protocols(address(this)), true);
+        assertEq(earthMindL1.protocols(protocol1.addr()), true);
     }
 
     function test_ProtocolUnRegister() public {
-        earthMindL1.registerProtocol();
+        protocol1.registerProtocol{value: 1 ether}();
 
         vm.expectEmit(true, false, false, true);
 
-        emit ProtocolUnregistered(address(this));
+        emit ProtocolUnregistered(protocol1.addr());
 
-        earthMindL1.unRegisterProtocol{value: 1 ether}();
+        protocol1.unRegisterProtocol{value: 1 ether}();
 
-        assertEq(earthMindL1.protocols(address(this)), false);
+        assertEq(earthMindL1.protocols(protocol1.addr()), false);
     }
 
     function test_MinerRegister() public {
         vm.expectEmit(true, false, false, true);
 
-        emit MinerRegistered(address(this));
+        emit MinerRegistered(miner1.addr());
 
-        earthMindL1.registerMiner{value: 1 ether}();
+        miner1.registerMiner{value: 1 ether}();
 
-        assertEq(earthMindL1.miners(address(this)), true);
+        assertEq(earthMindL1.miners(miner1.addr()), true);
     }
 
     function test_MinerUnRegister() public {
-        earthMindL1.registerMiner();
+        miner1.registerMiner{value: 1 ether}();
 
         vm.expectEmit(true, false, false, true);
 
-        emit MinerUnregistered(address(this));
+        emit MinerUnregistered(miner1.addr());
 
-        earthMindL1.unRegisterMiner{value: 1 ether}();
+        miner1.unRegisterMiner{value: 1 ether}();
 
-        assertEq(earthMindL1.miners(address(this)), false);
+        assertEq(earthMindL1.miners(miner1.addr()), false);
     }
 
     function test_ValidatorRegister() public {
         vm.expectEmit(true, false, false, true);
 
-        emit ValidatorRegistered(address(this));
+        emit ValidatorRegistered(validator1.addr());
 
-        earthMindL1.registerValidator{value: 1 ether}();
+        validator1.registerValidator{value: 1 ether}();
 
-        assertEq(earthMindL1.validators(address(this)), true);
+        assertEq(earthMindL1.validators(validator1.addr()), true);
     }
 
     function test_ValidatorUnRegister() public {
-        earthMindL1.registerValidator();
+        validator1.registerValidator{value: 1 ether}();
 
         vm.expectEmit(true, false, false, true);
 
-        emit ValidatorUnregistered(address(this));
+        emit ValidatorUnregistered(validator1.addr());
 
-        earthMindL1.unRegisterValidator{value: 1 ether}();
+        validator1.unRegisterValidator{value: 1 ether}();
 
-        assertEq(earthMindL1.validators(address(this)), false);
+        assertEq(earthMindL1.validators(validator1.addr()), false);
     }
 }

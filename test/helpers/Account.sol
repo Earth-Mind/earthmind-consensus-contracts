@@ -43,7 +43,7 @@ contract Account {
 
         // Approve permissions to registry contract
         vm.startPrank(addr);
-        _earthMindTokenInstance.approve(address(_earthMindRegistryL1Instance), 20_000 ether);
+        _earthMindTokenInstance.approve(address(_earthMindRegistryL1Instance), 50_000 ether);
         vm.stopPrank();
 
         // Set initial balances

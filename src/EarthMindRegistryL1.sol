@@ -122,12 +122,12 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
             revert NoGasPaymentProvided();
         }
 
-        gasReceiver.payNativeGasForContractCall{value: msg.value}(
-            address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender
-        );
+        // gasReceiver.payNativeGasForContractCall{value: msg.value}(
+        //     address(this), DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender
+        // );
 
-        gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
+        // gateway.callContract(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload);
 
-        emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender);
+        // emit ContractCallSent(DESTINATION_CHAIN, DESTINATION_ADDRESS, _payload, _sender);
     }
 }
