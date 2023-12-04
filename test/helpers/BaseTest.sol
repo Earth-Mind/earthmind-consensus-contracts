@@ -3,9 +3,9 @@ pragma solidity 0.8.19;
 
 import {Test, console2} from "forge-std/Test.sol";
 
-import {Validator} from "./helpers/Validator.sol";
-import {Miner} from "./helpers/Miner.sol";
-import {Protocol} from "./helpers/Protocol.sol";
+import {Validator} from "../helpers/Validator.sol";
+import {Protocol} from "../helpers/Protocol.sol";
+import {Miner} from "../helpers/Miner.sol";
 
 contract BaseTest is Test {
     function _increaseTimeBy(uint256 _time) internal {

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {EarthMindRegistryL1} from "../src/EarthMindRegistryL1.sol";
-import {EarthMindRegistryL2} from "../src/EarthMindRegistryL2.sol";
-import {CrossChainSetup} from "../src/CrossChainSetup.sol";
+import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
+import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
+import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 
-import {BaseRegistryTest} from "./BaseRegistryTest.sol";
+import {BaseRegistryTest} from "./helpers/BaseRegistryTest.sol";
 
 contract EarthMindRegistryL1Test is BaseRegistryTest {
     event ProtocolRegistered(address indexed protocol);

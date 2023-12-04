@@ -14,6 +14,7 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
     ///////////////////////////////////////////////////////////////////////////
     //  OVERRIDE FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
         // @dev Since this is in the L2, the destionation chain is the source chain or L1
         DESTINATION_CHAIN = setupData.sourceChain;
@@ -28,7 +29,7 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
         internal
         override
     {
-        (uint256 nonce, bytes memory payloadActual) = abi.decode(payload, (uint256, bytes));
-        gateway.callContract(sourceChain, sourceAddress, abi.encode(nonce));
+        // (uint256 nonce, bytes memory payloadActual) = abi.decode(payload, (uint256, bytes));
+        // gateway.callContract(sourceChain, sourceAddress, abi.encode(nonce));
     }
 }

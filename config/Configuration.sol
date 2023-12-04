@@ -2,6 +2,7 @@
 pragma solidity 0.8.19;
 
 library Configuration {
+    bytes32 public constant SALT = hex"65617274686D696E64"; // earthmind
     string public constant SOURCE_CHAIN = "5"; // Goerli for testing
     string public constant DESTINATION_CHAIN = "1313161555"; // Aurora testnet for testing
     address public constant AXELAR_GATEWAY = 0xe432150cce91c13a887f7D836923d5597adD8E31;
