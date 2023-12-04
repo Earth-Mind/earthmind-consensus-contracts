@@ -17,4 +17,7 @@ contract Validator is Account {
         earthMindRegistryL1Instance.unRegisterValidator{value: msg.value}();
         _refreshBalances();
     }
+
+    // commit scores
+    // reveal scores
 }

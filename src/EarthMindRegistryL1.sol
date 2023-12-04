@@ -16,6 +16,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
     ///////////////////////////////////////////////////////////////////////////
     //  OVERRIDE FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////
+
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
         DESTINATION_CHAIN = setupData.destinationChain;
         DESTINATION_ADDRESS = Strings.toHexString(setupData.registryL2);

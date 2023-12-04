@@ -17,4 +17,7 @@ contract Miner is Account {
         earthMindRegistryL1Instance.unRegisterMiner{value: msg.value}();
         _refreshBalances();
     }
+
+    // commit proposal
+    // reveal proposal
 }
