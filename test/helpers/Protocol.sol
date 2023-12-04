@@ -2,7 +2,6 @@
 pragma solidity 0.8.19;
 
 import "./Account.sol";
-import {console2} from "forge-std/Test.sol";
 
 contract Protocol is Account {
     constructor(string memory _name, Vm _vm) Account(_name, _vm) {}
