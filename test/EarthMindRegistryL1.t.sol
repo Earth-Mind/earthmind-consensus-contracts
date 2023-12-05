@@ -21,16 +21,11 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         _setUp();
 
         // setup mocks
-        axelarGasServiceMock.when(
-            MockProvider.Calling({
-                functionSig: IAxelarGasService.payNativeGasForContractCall.selector,
-                returnValue: abi.encode(true)
-            })
-        );
+        axelarGasServiceMock.when(IAxelarGasService.payNativeGasForContractCall.selector).thenReturns(abi.encode(true));
 
-        axelarGatewayMock.when(
-            MockProvider.Calling({functionSig: IAxelarGateway.callContract.selector, returnValue: abi.encode(true)})
-        );
+        axelarGatewayMock.when(IAxelarGateway.callContract.selector).thenReturns(abi.encode(true));
+        //     MockProvider.Calling({functionSig: IAxelarGateway.callContract.selector, returnValue: abi.encode(true)})
+        // );
     }
 
     function test_ProtocolRegister() public {
