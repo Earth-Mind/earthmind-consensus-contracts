@@ -6,11 +6,7 @@ import {Strings} from "@openzeppelin/utils/Strings.sol";
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
 
-import {InvalidSourceAddress, InvalidSourceChain} from "./Errors.sol";
-
 contract EarthMindRegistryL2 is EarthMindRegistry {
-    mapping(bytes4 => function(address) internal) private functionMappings;
-
     constructor(CrossChainSetup _setup, address _gateway, address _gasService)
         EarthMindRegistry(_setup, _gateway, _gasService)
     {
@@ -18,47 +14,46 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
         functionMappings[bytes4(keccak256("_registerProtocol(address)"))] = _registerProtocol;
         functionMappings[bytes4(keccak256("_unRegisterProtocol(address)"))] = _unRegisterProtocol;
         functionMappings[bytes4(keccak256("_registerMiner(address)"))] = _registerMiner;
-        functionMappings[bytes4(keccak256("_unRegisterMiner(address)"))] = _unRegisterMiner;
         functionMappings[bytes4(keccak256("_registerValidator(address)"))] = _registerValidator;
-        functionMappings[bytes4(keccak256("_unRegisterValidator(address)"))] = _unRegisterValidator;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //  OVERRIDE FUNCTIONS
-    ///////////////////////////////////////////////////////////////////////////
+    // Override functions
 
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
-        // @dev Since this is in the L2, the destionation chain is the source chain or L1
+        // @dev Since this is in the L2, the destination chain is the source chain or L1
         DESTINATION_CHAIN = setupData.sourceChain;
         DESTINATION_ADDRESS = Strings.toHexString(setupData.registryL1);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //  MESSAGING FUNCTIONS
-    ///////////////////////////////////////////////////////////////////////////
+    // External functions
 
-    function _execute(string calldata sourceChain, string calldata sourceAddress, bytes calldata payload)
-        internal
-        override
-    {
-        if (!_isValidSourceAddress(sourceAddress)) {
-            revert InvalidSourceAddress();
-        }
+    function unRegisterMiner() external payable {
+        _validateMinerUnRegistration(msg.sender);
 
-        if (!_isValidSourceChain(sourceChain)) {
-            revert InvalidSourceChain();
-        }
+        super._unRegisterMiner(msg.sender);
 
-        bytes4 funcSelector = abi.decode(payload, (bytes4));
-        address param = abi.decode(payload, (address));
-        functionMappings[funcSelector](param);
+        _bridge(abi.encodeWithSignature("unRegisterMiner(address)", msg.sender), msg.sender);
     }
 
-    function _isValidSourceAddress(string calldata sourceAddress) internal view returns (bool) {
-        return keccak256(abi.encodePacked(sourceAddress)) == keccak256(abi.encodePacked(DESTINATION_ADDRESS));
+    function unRegisterValidator() external payable {
+        _validateValidatorUnRegistration(msg.sender);
+
+        super._unRegisterValidator(msg.sender);
+
+        _bridge(abi.encodeWithSignature("unRegisterValidator(address)", msg.sender), msg.sender);
     }
 
-    function _isValidSourceChain(string calldata sourceChain) internal view returns (bool) {
-        return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(DESTINATION_CHAIN));
+    // Validating functions
+
+    function _validateMinerUnRegistration(address miner) internal view {
+        require(miners[miner], "Miner no registered");
+
+        // TODO: implement logic and increase validation conditions
+    }
+
+    function _validateValidatorUnRegistration(address validator) internal view {
+        require(validators[validator], "Validator not registered");
+
+        // TODO: implement logic and increase validation conditions
     }
 }

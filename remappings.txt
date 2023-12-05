@@ -1,4 +1,5 @@
-@axelar-network/axelar-gmp-sdk-solidity/=lib/axelar-gmp-sdk-solidity/contracts/
+forge-std/=lib/forge-std/src/
+@axelar/=lib/axelar-gmp-sdk-solidity/contracts/
 @openzeppelin/=lib/openzeppelin-contracts/contracts/
 @contracts/=src/
 @config/=config/

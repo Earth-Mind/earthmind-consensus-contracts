@@ -14,7 +14,7 @@ contract Miner is Account {
 
     function unRegisterMiner() external payable {
         vm.prank(addr);
-        earthMindRegistryL1Instance.unRegisterMiner{value: msg.value}();
+        earthMindRegistryL2Instance.unRegisterMiner{value: msg.value}();
         _refreshBalances();
     }
 

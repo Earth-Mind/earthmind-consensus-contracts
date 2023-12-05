@@ -14,7 +14,7 @@ contract Validator is Account {
 
     function unRegisterValidator() external payable {
         vm.prank(addr);
-        earthMindRegistryL1Instance.unRegisterValidator{value: msg.value}();
+        earthMindRegistryL2Instance.unRegisterValidator{value: msg.value}();
         _refreshBalances();
     }
 
