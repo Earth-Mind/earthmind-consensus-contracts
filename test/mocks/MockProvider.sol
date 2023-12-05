@@ -1,7 +1,5 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
-
-import "forge-std/console.sol";
 
 contract MockProvider {
     mapping(bytes4 functionSignature => bytes returnData) internal mockConfigurations;
@@ -25,7 +23,7 @@ contract MockProvider {
     }
 
     fallback(bytes calldata) external payable returns (bytes memory) {
-        bytes4 selectorKey = bytes4(keccak256(abi.encode(msg.sig)));
+        bytes4 selectorKey = msg.sig;
 
         if (!mockConfigurationExists[selectorKey]) {
             revert("MockProvider: No configuration found for the given function signature");

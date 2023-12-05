@@ -8,6 +8,8 @@ import {CrossChainSetup} from "./CrossChainSetup.sol";
 
 import {NoGasPaymentProvided, InvalidSourceAddress, InvalidSourceChain} from "./Errors.sol";
 
+import "forge-std/console2.sol";
+
 abstract contract EarthMindRegistry is AxelarExecutable {
     IAxelarGasService public immutable gasReceiver;
 
@@ -111,8 +113,18 @@ abstract contract EarthMindRegistry is AxelarExecutable {
             revert InvalidSourceChain();
         }
 
-        bytes4 funcSelector = abi.decode(payload, (bytes4));
-        address param = abi.decode(payload, (address));
+        bytes memory payloadCopy = payload;
+        bytes4 funcSelector;
+        address param;
+
+        assembly {
+            // @dev Get the first 4 bytes (function signature) from payload
+            funcSelector := mload(add(payloadCopy, 0x20))
+
+            // @dev Get the parameter from payload
+            param := mload(add(payloadCopy, 0x24))
+        }
+
         functionMappings[funcSelector](param);
     }
 }
