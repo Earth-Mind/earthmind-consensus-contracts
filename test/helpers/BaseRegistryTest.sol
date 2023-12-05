@@ -10,6 +10,7 @@ import {EarthMindToken} from "@contracts/EarthMindToken.sol";
 import {Deployer} from "@contracts/utils/Deployer.sol";
 
 import {Configuration} from "@config/Configuration.sol";
+import {MockProvider} from "../mocks/MockProvider.sol";
 
 import "forge-std/console.sol";
 
@@ -28,13 +29,17 @@ contract BaseRegistryTest is BaseTest {
 
     address internal DEPLOYER = vm.addr(1234);
 
+    // Mock
+    MockProvider internal axelarGatewayMock;
+    MockProvider internal axelarGasServiceMock;
+
     function _setUp() internal {
         _setupAccounts();
         _deploy();
 
-        miner1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
-        validator1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
-        protocol1.init(earthMindL1, earthMindTokenInstance, DEPLOYER);
+        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
+        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
+        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
     }
 
     function _setupAccounts() private {
@@ -50,10 +55,13 @@ contract BaseRegistryTest is BaseTest {
         earthMindTokenInstance = new EarthMindToken();
         crosschainSetup = new CrossChainSetup();
 
+        axelarGatewayMock = new MockProvider();
+        axelarGasServiceMock = new MockProvider();
+
         // calculate the address of the L1 contract
         bytes memory creationCodeL1 = abi.encodePacked(
             type(EarthMindRegistryL1).creationCode,
-            abi.encode(crosschainSetup, Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE) // Encoding all constructor arguments
+            abi.encode(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
         address l1Address = deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL1));
@@ -62,7 +70,7 @@ contract BaseRegistryTest is BaseTest {
         // calculate the address of the L2 contract
         bytes memory creationCodeL2 = abi.encodePacked(
             type(EarthMindRegistryL2).creationCode,
-            abi.encode(address(crosschainSetup), Configuration.AXELAR_GATEWAY, Configuration.AXELAR_GAS_SERVICE) // Encoding all constructor arguments
+            abi.encode(address(crosschainSetup), address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
         address l2Address = deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL2));
@@ -73,8 +81,6 @@ contract BaseRegistryTest is BaseTest {
 
         address deployedAddressL1 = deployer.deploy(0, Configuration.SALT, creationCodeL1);
         address deployedAddressL2 = deployer.deploy(0, Configuration.SALT, creationCodeL2);
-        console.log("L1 address using deployer: %s", deployedAddressL1);
-        console.log("L2 address using deployer: %s", deployedAddressL2);
 
         earthMindL1 = EarthMindRegistryL1(deployedAddressL1);
         earthMindL2 = EarthMindRegistryL2(deployedAddressL2);

@@ -12,6 +12,7 @@ contract Account {
 
     EarthMindToken internal earthMindTokenInstance;
     EarthMindRegistryL1 internal earthMindRegistryL1Instance;
+    EarthMindRegistryL2 internal earthMindRegistryL2Instance;
 
     uint256 public initialTokenBalance;
     uint256 public currentTokenBalance;
@@ -30,6 +31,7 @@ contract Account {
 
     function init(
         EarthMindRegistryL1 _earthMindRegistryL1Instance,
+        EarthMindRegistryL2 _earthMindRegistryL2Instance,
         EarthMindToken _earthMindTokenInstance,
         address _deployer
     ) public {
@@ -53,6 +55,7 @@ contract Account {
         // Set instances
         earthMindTokenInstance = _earthMindTokenInstance;
         earthMindRegistryL1Instance = _earthMindRegistryL1Instance;
+        earthMindRegistryL2Instance = _earthMindRegistryL2Instance;
     }
 
     function refreshBalances() public {
