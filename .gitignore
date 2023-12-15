@@ -14,3 +14,10 @@ docs/
 .env
 .poc
 TODO.md
+
+# Coverage
+coverage/
+lcov.info
+
+# Mac
+.DS_Store
