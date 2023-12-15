@@ -10,8 +10,9 @@ import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {Configuration} from "@config/Configuration.sol";
 
+import {MockProvider} from "@contracts/mocks/MockProvider.sol";
+
 import {BaseRegistryTest} from "./helpers/BaseRegistryTest.sol";
-import {MockProvider} from "./mocks/MockProvider.sol";
 
 import "forge-std/console2.sol";
 

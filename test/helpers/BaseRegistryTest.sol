@@ -10,7 +10,8 @@ import {EarthMindToken} from "@contracts/EarthMindToken.sol";
 import {Deployer} from "@contracts/utils/Deployer.sol";
 
 import {Configuration} from "@config/Configuration.sol";
-import {MockProvider} from "../mocks/MockProvider.sol";
+
+import {MockProvider} from "@contracts/mocks/MockProvider.sol";
 
 import "forge-std/console.sol";
 

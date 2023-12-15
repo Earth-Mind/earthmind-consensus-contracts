@@ -6,7 +6,12 @@ import {Strings} from "@openzeppelin/utils/Strings.sol";
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
 
-import {NoGasPaymentProvided} from "./Errors.sol";
+import {
+    ProtocolAlreadyRegistered,
+    ProtocolNotRegistered,
+    MinerAlreadyRegistered,
+    ValidatorAlreadyRegistered
+} from "./Errors.sol";
 
 contract EarthMindRegistryL1 is EarthMindRegistry {
     constructor(CrossChainSetup _setup, address _gateway, address _gasService)
@@ -59,27 +64,34 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
     // Validating functions
 
-    function _validateProtocolRegistration(address protocol) internal view {
-        require(!protocols[protocol], "Protocol already registered");
+    function _validateProtocolRegistration(address _protocol) internal view {
+        if (protocols[_protocol]) {
+            revert ProtocolAlreadyRegistered(_protocol);
+        }
 
         // TODO: implement logic and increase validation conditions
     }
 
-    function _validateProtocolUnRegistration(address protocol) internal view {
-        require(protocols[protocol], "Protocol not registered");
+    function _validateProtocolUnRegistration(address _protocol) internal view {
+        if (!protocols[_protocol]) {
+            revert ProtocolNotRegistered(_protocol);
+        }
 
         // TODO: implement logic and increase validation conditions
     }
 
-    function _validateMinerRegistration(address miner) internal view {
-        require(!miners[miner], "Miner already registered");
+    function _validateMinerRegistration(address _miner) internal view {
+        if (miners[_miner]) {
+            revert MinerAlreadyRegistered(_miner);
+        }
 
         // TODO: implement logic and increase validation conditions
     }
 
-    function _validateValidatorRegistration(address validator) internal view {
-        require(!validators[validator], "Validator already registered");
-
+    function _validateValidatorRegistration(address _validator) internal view {
+        if (validators[_validator]) {
+            revert ValidatorAlreadyRegistered(_validator);
+        }
         // TODO: implement logic and increase validation conditions
     }
 }

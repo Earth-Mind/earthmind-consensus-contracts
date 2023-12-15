@@ -6,6 +6,8 @@ import {Strings} from "@openzeppelin/utils/Strings.sol";
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
 
+import {MinerNotRegistered, ValidatorNotRegistered} from "./Errors.sol";
+
 contract EarthMindRegistryL2 is EarthMindRegistry {
     constructor(CrossChainSetup _setup, address _gateway, address _gasService)
         EarthMindRegistry(_setup, _gateway, _gasService)
@@ -45,15 +47,17 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
 
     // Validating functions
 
-    function _validateMinerUnRegistration(address miner) internal view {
-        require(miners[miner], "Miner no registered");
-
+    function _validateMinerUnRegistration(address _miner) internal view {
+        if (!miners[_miner]) {
+            revert MinerNotRegistered(_miner);
+        }
         // TODO: implement logic and increase validation conditions
     }
 
-    function _validateValidatorUnRegistration(address validator) internal view {
-        require(validators[validator], "Validator not registered");
-
+    function _validateValidatorUnRegistration(address _validator) internal view {
+        if (!validators[_validator]) {
+            revert ValidatorNotRegistered(_validator);
+        }
         // TODO: implement logic and increase validation conditions
     }
 }
