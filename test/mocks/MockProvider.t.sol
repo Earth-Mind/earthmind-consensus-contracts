@@ -45,7 +45,7 @@ contract MockProviderTest is Test {
     function test_fallback_whenNoConfiguration_reverts() public {
         vm.expectRevert("MockProvider: No configuration found for the given function signature");
 
-        (bool revertsAsExpected, bytes memory data) = address(instance).call(abi.encodeWithSelector(bytes4(0x12345678)));
+        (bool revertsAsExpected,) = address(instance).call(abi.encodeWithSelector(bytes4(0x12345678)));
 
         assertTrue(revertsAsExpected, "expectRevert: call did not revert");
     }
