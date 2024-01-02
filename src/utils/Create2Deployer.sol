@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract Deployer {
+contract Create2Deployer {
     error Create2InsufficientBalance(uint256 received, uint256 minimumNeeded);
 
     error Create2EmptyBytecode();

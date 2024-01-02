@@ -20,3 +20,25 @@ error ValidatorNotRegistered(address miner);
 error MinerAlreadyRegistered(address miner);
 
 error MinerNotRegistered(address miner);
+
+error InvalidValidator(address validator);
+
+error InvalidMiner(address miner);
+
+error InvalidProposal(address miner);
+
+error InvalidTopMinerProposal(address validator);
+
+error ProposalAlreadyCommitted(address miner);
+
+error ProposalAlreadyRevealed(address miner);
+
+error ProposalNotCommitted(address miner);
+
+error TopMinerProposalAlreadyCommitted(address validator);
+
+error TopMinerProposalAlreadyRevealed(address validator);
+
+error TopMinerProposalNotCommitted(address validator);
+
+error EpochEnded();
