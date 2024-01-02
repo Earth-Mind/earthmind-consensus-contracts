@@ -1,90 +1,110 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "./BaseTest.sol";
+import {BaseTest} from "./BaseTest.sol";
 
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {EarthMindToken} from "@contracts/EarthMindToken.sol";
-import {Deployer} from "@contracts/utils/Deployer.sol";
-
-import {Configuration} from "@config/Configuration.sol";
+import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 
 import {MockProvider} from "@contracts/mocks/MockProvider.sol";
 
+import {Configuration} from "@config/Configuration.sol";
+
+import {Validator} from "./Validator.sol";
+import {Protocol} from "./Protocol.sol";
+import {Miner} from "./Miner.sol";
+
 import "forge-std/console.sol";
 
+// @dev This contract is used to test the registry contracts
+// By default we define 3 accounts per each ecosystem participant
+// However, the accounts can be overwritten by the test contract that inherits from this contract.
+// It also includes virtual functions that can be overwritten by the test contract.
 contract BaseRegistryTest is BaseTest {
     // Instances
-    Deployer internal deployer;
+    Create2Deployer internal create2Deployer;
     EarthMindRegistryL1 internal earthMindL1;
     EarthMindRegistryL2 internal earthMindL2;
     CrossChainSetup internal crosschainSetup;
     EarthMindToken internal earthMindTokenInstance;
+
+    address internal DEPLOYER = vm.addr(1234);
+    address internal EARTHMIND_CONSENSUS_ADDRESS = address(0); // @dev Since the registry doesn't require the consensus but the Account contract does it, we simply pass address(0)
 
     // Accounts
     Validator internal validator1;
     Protocol internal protocol1;
     Miner internal miner1;
 
-    address internal DEPLOYER = vm.addr(1234);
-
     // Mock
     MockProvider internal axelarGatewayMock;
     MockProvider internal axelarGasServiceMock;
 
-    function _setUp() internal {
-        _setupAccounts();
+    function _setUp() public {
         _deploy();
 
-        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
-        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
-        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, DEPLOYER);
+        _setupAccounts();
     }
 
-    function _setupAccounts() private {
+    function _setupAccounts() internal virtual {
         validator1 = new Validator("validator_1", vm);
         miner1 = new Miner("miner_1", vm);
         protocol1 = new Protocol("protocol_1", vm);
+
+        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
+        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
+        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
     }
 
-    function _deploy() private {
+    function _deploy() internal virtual {
         vm.startPrank(DEPLOYER);
 
-        deployer = new Deployer();
+        // we deploy a deployer contract to deploy the registry contracts
+        create2Deployer = new Create2Deployer();
         earthMindTokenInstance = new EarthMindToken();
         crosschainSetup = new CrossChainSetup();
 
+        // setup mock providers
         axelarGatewayMock = new MockProvider();
         axelarGasServiceMock = new MockProvider();
 
-        // calculate the address of the L1 contract
+        // calculate the address of the RegistryL1 contract
         bytes memory creationCodeL1 = abi.encodePacked(
             type(EarthMindRegistryL1).creationCode,
             abi.encode(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address l1Address = deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL1));
-        console.log("L1 address: %s", l1Address);
+        address registryL1ComputedAddress =
+            create2Deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL1));
+        console.log("The RegistryL1 address: %s", registryL1ComputedAddress);
 
-        // calculate the address of the L2 contract
+        // calculate the address of the RegistryL2 contract
         bytes memory creationCodeL2 = abi.encodePacked(
             type(EarthMindRegistryL2).creationCode,
             abi.encode(address(crosschainSetup), address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address l2Address = deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL2));
-        console.log("L2 address: %s", l2Address);
+        address registryL2ComputedAddress =
+            create2Deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL2));
+        console.log("The RegistryL2 address: %s", registryL2ComputedAddress);
 
-        // setup the crosschain setup contract
-        crosschainSetup.setup(Configuration.SOURCE_CHAIN, Configuration.DESTINATION_CHAIN, l1Address, l2Address);
+        // setup the crosschain setup contract with the addresses of the registry contracts
+        crosschainSetup.setup(
+            Configuration.SOURCE_CHAIN,
+            Configuration.DESTINATION_CHAIN,
+            registryL1ComputedAddress,
+            registryL2ComputedAddress
+        );
 
-        address deployedAddressL1 = deployer.deploy(0, Configuration.SALT, creationCodeL1);
-        address deployedAddressL2 = deployer.deploy(0, Configuration.SALT, creationCodeL2);
+        // deploy the registry contracts
+        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, Configuration.SALT, creationCodeL1);
+        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, Configuration.SALT, creationCodeL2);
 
-        earthMindL1 = EarthMindRegistryL1(deployedAddressL1);
-        earthMindL2 = EarthMindRegistryL2(deployedAddressL2);
+        earthMindL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
+        earthMindL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
 
         vm.stopPrank();
     }
