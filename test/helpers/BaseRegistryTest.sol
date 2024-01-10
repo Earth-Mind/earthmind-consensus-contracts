@@ -43,7 +43,7 @@ contract BaseRegistryTest is BaseTest {
     MockProvider internal axelarGatewayMock;
     MockProvider internal axelarGasServiceMock;
 
-    function _setUp() public {
+    function _setUp() internal virtual {
         _deploy();
 
         _setupAccounts();
@@ -54,9 +54,13 @@ contract BaseRegistryTest is BaseTest {
         miner1 = new Miner("miner_1", vm);
         protocol1 = new Protocol("protocol_1", vm);
 
-        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
-        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
-        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, EARTHMIND_CONSENSUS_ADDRESS, DEPLOYER);
+        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
+        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
+        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
+    }
+
+    function _getConsensusAddress() internal view virtual returns (address) {
+        return EARTHMIND_CONSENSUS_ADDRESS;
     }
 
     function _deploy() internal virtual {

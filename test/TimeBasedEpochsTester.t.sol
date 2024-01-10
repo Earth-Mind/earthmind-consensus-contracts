@@ -9,6 +9,8 @@ import {BaseTest} from "./helpers/BaseTest.sol";
 contract TimeBasedEpochsTesterTest is BaseTest {
     TimeBasedEpochsTester public timeBasedEpochsTester;
 
+    address SENDER = address(0x1);
+
     event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
     event ProposalRevealed(uint256 indexed epoch, address indexed miner, bool vote, string message);
     event TopMinersProposalCommitted(uint256 indexed epoch, address indexed validator, bytes32 scoreHash);
@@ -35,6 +37,11 @@ contract TimeBasedEpochsTesterTest is BaseTest {
 
         assertEq(timeBasedEpochsTester.getEpoch(epoch).startTime, block.timestamp);
 
+        vm.expectEmit(true, true, false, true);
+
+        emit ProposalCommitted(epoch, SENDER, bytes32(0x0));
+
+        vm.prank(SENDER);
         timeBasedEpochsTester.commitProposal(epoch, bytes32(0x0));
     }
 
@@ -68,6 +75,12 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         _increaseTimeBy(5 minutes);
 
         assertEq(uint256(timeBasedEpochsTester.getEpochStage(epoch)), uint256(TimeBasedEpochs.Stage.RevealMiners));
+
+        vm.expectEmit(true, true, false, true);
+
+        emit ProposalRevealed(epoch, SENDER, true, "No issues found");
+
+        vm.prank(SENDER);
 
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
@@ -107,6 +120,12 @@ contract TimeBasedEpochsTesterTest is BaseTest {
 
         assertEq(uint256(timeBasedEpochsTester.getEpochStage(epoch)), uint256(TimeBasedEpochs.Stage.CommitValidators));
 
+        vm.expectEmit(true, true, false, true);
+
+        emit TopMinersProposalCommitted(epoch, SENDER, bytes32(0x0));
+
+        vm.prank(SENDER);
+
         timeBasedEpochsTester.commitTopMinersProposal(epoch, bytes32(0x0));
     }
 
@@ -137,6 +156,12 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         address[] memory minerAddresses = new address[](1);
 
         minerAddresses[0] = address(0x0);
+
+        vm.expectEmit(true, true, false, true);
+
+        emit TopMinersProposalRevealed(epoch, SENDER, minerAddresses);
+
+        vm.prank(SENDER);
 
         timeBasedEpochsTester.revealTopMinersProposal(epoch, minerAddresses);
     }

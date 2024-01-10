@@ -3,11 +3,16 @@ pragma solidity 0.8.19;
 
 import {EpochEnded} from "./Errors.sol";
 
+import "forge-std/console2.sol";
+
 contract TimeBasedEpochs {
     uint8 internal constant ZERO = 0;
 
     struct Epoch {
         uint256 startTime;
+        uint256 endTime;
+        bytes32 proposalId;
+        address sender;
     }
 
     enum Stage {
@@ -23,6 +28,7 @@ contract TimeBasedEpochs {
     uint256 internal MinerRevealPeriod = 5 minutes;
     uint256 internal ValidatorCommitPeriod = 5 minutes;
     uint256 internal ValidatorRevealPeriod = 5 minutes;
+    uint256 internal SettlementPeriod = 10 minutes;
 
     uint256 public totalEpochs;
 
@@ -30,6 +36,8 @@ contract TimeBasedEpochs {
 
     function getEpochStage(uint256 _epoch) public view returns (Stage) {
         uint256 elapsed = block.timestamp - epochs[_epoch].startTime;
+
+        console2.log("Elapsed: %s", elapsed);
 
         if (epochs[_epoch].startTime == ZERO) {
             return Stage.NonStarted;
@@ -65,6 +73,10 @@ contract TimeBasedEpochs {
 
     function getValidatorRevealPeriod() external view returns (uint256) {
         return ValidatorRevealPeriod;
+    }
+
+    function getSettlementPeriod() external view returns (uint256) {
+        return SettlementPeriod;
     }
 
     function getEpoch(uint256 _epoch) external view returns (Epoch memory) {
