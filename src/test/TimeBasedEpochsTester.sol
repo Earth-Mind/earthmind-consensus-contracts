@@ -3,7 +3,7 @@ pragma solidity 0.8.19;
 
 import "../TimeBasedEpochs.sol";
 
-// @dev This is tester contract to check the TimeBasedEpochs transitions
+// @dev This is a tester contract to check the TimeBasedEpochs transitions.
 // The modifiers and state are ignored.
 contract TimeBasedEpochsTester is TimeBasedEpochs {
     event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);

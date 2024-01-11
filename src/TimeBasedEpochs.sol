@@ -3,8 +3,6 @@ pragma solidity 0.8.19;
 
 import {EpochEnded} from "./Errors.sol";
 
-import "forge-std/console2.sol";
-
 contract TimeBasedEpochs {
     uint8 internal constant ZERO = 0;
 
@@ -36,8 +34,6 @@ contract TimeBasedEpochs {
 
     function getEpochStage(uint256 _epoch) public view returns (Stage) {
         uint256 elapsed = block.timestamp - epochs[_epoch].startTime;
-
-        console2.log("Elapsed: %s", elapsed);
 
         if (epochs[_epoch].startTime == ZERO) {
             return Stage.NonStarted;

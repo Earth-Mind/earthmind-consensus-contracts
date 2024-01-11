@@ -8,8 +8,6 @@ import {CrossChainSetup} from "./CrossChainSetup.sol";
 
 import {NoGasPaymentProvided, InvalidSourceAddress, InvalidSourceChain} from "./Errors.sol";
 
-import "forge-std/console2.sol";
-
 abstract contract EarthMindRegistry is AxelarExecutable {
     IAxelarGasService public immutable gasReceiver;
 

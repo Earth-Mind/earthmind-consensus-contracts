@@ -5,6 +5,7 @@ import {Ownable} from "@openzeppelin/access/Ownable.sol";
 
 import {CrossChainSetupHasBeenInitialised} from "./Errors.sol";
 
+// @notice Contract used to setup cross chain contracts that have a dependency between them.
 contract CrossChainSetup is Ownable {
     struct SetupData {
         string sourceChain;

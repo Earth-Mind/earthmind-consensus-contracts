@@ -26,8 +26,6 @@ import {
 
 import {StringUtils} from "./libraries/StringUtils.sol";
 
-import "forge-std/console2.sol";
-
 contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     IAxelarGasService public immutable gasReceiver;
 
@@ -74,7 +72,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         onlyMiners
         atStage(_epoch, Stage.CommitMiners)
     {
-        console2.log("HERE");
         MinerProposal storage proposal = minerProposals[_epoch][msg.sender];
 
         if (proposal.proposalHash != 0) {
@@ -157,6 +154,54 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         emit TopMinersProposalRevealed(_epoch, msg.sender, _minerAddresses);
     }
 
+    // Internal Functions
+    function _requestGovernanceDecision(bytes memory _payload) internal {
+        totalEpochs++;
+        Request memory request = abi.decode(_payload, (Request));
+
+        epochs[totalEpochs] = Epoch({
+            startTime: block.timestamp,
+            endTime: block.timestamp + MinerCommitPeriod + MinerRevealPeriod + ValidatorCommitPeriod + ValidatorRevealPeriod
+                + SettlementPeriod,
+            proposalId: request.proposalId,
+            sender: request.sender
+        });
+
+        emit RequestReceived(totalEpochs, request.sender, request.proposalId);
+    }
+
+    function _execute(string calldata sourceChain, string calldata sourceAddress, bytes calldata _payload)
+        internal
+        override
+    {
+        // @dev this should be the protocol itself, then I should validate against the protocol list
+        if (!_isValidSourceAddress(sourceAddress)) {
+            revert InvalidSourceAddress();
+        }
+
+        if (!_isValidSourceChain(sourceChain)) {
+            revert InvalidSourceChain();
+        }
+
+        // @dev Since the only way to request a governance decision is via cross chain message, there is no need to map functions
+        _requestGovernanceDecision(_payload);
+    }
+
+    function _isValidSourceAddress(string memory sourceAddress) internal view returns (bool) {
+        address addr = StringUtils.stringToAddress(sourceAddress);
+
+        return registry.protocols(addr);
+    }
+
+    function _isValidSourceChain(string calldata sourceChain) internal view returns (bool) {
+        return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(registry.DESTINATION_CHAIN()));
+    }
+
+    function aggregateAndPropagateDecisionFromValidatorXToY() external {
+        // TODO: only when the decision has been taken....
+        // TODO compute scores
+    }
+
     // Modifiers
     modifier onlyMiners() {
         if (!registry.miners(msg.sender)) {
@@ -171,111 +216,4 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         }
         _;
     }
-
-    function _requestGovernanceDecision(bytes memory _payload) internal {
-        totalEpochs++;
-        console2.log("Total Epochs: %s", totalEpochs);
-        console2.logBytes(_payload);
-        Request memory request = abi.decode(_payload, (Request));
-        console2.logBytes32(request.proposalId);
-        console2.logAddress(request.sender);
-
-        console2.log("Start Time: %s", block.timestamp);
-
-        epochs[totalEpochs] = Epoch({
-            startTime: block.timestamp,
-            endTime: block.timestamp + MinerCommitPeriod + MinerRevealPeriod + ValidatorCommitPeriod + ValidatorRevealPeriod
-                + SettlementPeriod,
-            proposalId: request.proposalId,
-            sender: request.sender
-        });
-
-        emit RequestReceived(totalEpochs, request.sender, request.proposalId);
-    }
-
-    function aggregateAndPropagateDecisionFromValidatorXToY() external {
-        // TODO: only when the decision has been taken....
-        // TODO compute scores
-    }
-
-    function _execute(string calldata sourceChain, string calldata sourceAddress, bytes calldata _payload)
-        internal
-        override
-    {
-        // this should be the protocol itself, then I should validate against the protoco list
-        if (!_isValidSourceAddress(sourceAddress)) {
-            revert InvalidSourceAddress();
-        }
-
-        if (!_isValidSourceChain(sourceChain)) {
-            revert InvalidSourceChain();
-        }
-
-        // @dev Since the only way to request a governance decision is via cross chain message and the only cross message from L1 to this contract is requesting a governance decision
-        // There is no need to map functions
-        _requestGovernanceDecision(_payload);
-    }
-
-    // function _isValidSourceAddress(string memory sourceAddress) internal view returns (bool) {
-    //     console.log("Source Address 1: %s", sourceAddress);
-
-    //     address addr;
-
-    //     require(bytes(sourceAddress).length == 42, "Invalid address length"); // Including '0x'
-
-    //     assembly {
-    //         // Skip the first 32 bytes (length) + 2 bytes ('0x')
-    //         addr := mload(add(sourceAddress, 0x24)) // 0x24 in hexadecimal is 36 in decimal
-    //     }
-
-    //     // Align the data correctly
-    //     addr = address(uint160(addr >> (12 * 8)));
-
-    //     console.log("Source Address: %s", Strings.toHexString(addr));
-    //     return registry.protocols(addr);
-    // }
-    function _isValidSourceAddress(string memory sourceAddress) internal view returns (bool) {
-        console2.log("Source Address 1: %s", sourceAddress);
-
-        address addr = StringUtils.stringToAddress(sourceAddress);
-
-        return registry.protocols(addr);
-    }
-
-    function _isValidSourceChain(string calldata sourceChain) internal view returns (bool) {
-        return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(registry.DESTINATION_CHAIN()));
-    }
-    // validator1 -> 10 []
-    // validator2 -> 10 []
-    // validator3 -> 10 []
-    // validator4 -> 10 []   -----> 10 []
-    // validator5 -> 10 []
-
-    // TODO proposalReceived via message
-    // TODO include time manipulation...
-    // when the request has started
 }
-
-// if validators just propose aggregated proposal....
-// validators reports the people who gets kicked out
-// Validators determine the aggregation outcome...
-// No kicks for now...
-// All we do is aggregate the responses from validators.....
-
-// The dream is to do it P2P -> like a Blockchain...
-
-// Aggregated Response of Validator
-// Yes or No based on the whole miners....
-// Just reward everybody
-
-// V1
-/// PoA: You have to be token holder
-/// No rewards for now
-/// Validators determine the aggregation outcome
-/// Whitelist both sides
-
-// validator1 -> Yes
-// validator2 -> Yes
-// validator3 -> Yes
-// validator4 -> Yes  -----> Yes
-// validator5 -> Yes
