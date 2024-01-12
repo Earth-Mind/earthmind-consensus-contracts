@@ -24,7 +24,6 @@ import "forge-std/console.sol";
 // However, the accounts can be overwritten by the test contract that inherits from this contract.
 // It also includes virtual functions that can be overwritten by the test contract.
 contract BaseRegistryTest is BaseTest {
-    // Instances
     Create2Deployer internal create2Deployer;
     EarthMindRegistryL1 internal earthMindL1;
     EarthMindRegistryL2 internal earthMindL2;

@@ -5,10 +5,3 @@ libs = ["lib"]
 solc = "0.8.19"
 optimizer_runs = 1000
 optimiser = true
-remappings = [
-    "forge-std/=lib/forge-std/src/",
-    "@axelar/=lib/axelar-gmp-sdk-solidity/contracts/",
-    "@openzeppelin/=lib/openzeppelin-contracts/contracts/",
-    "@contracts/=src/",
-    "@config/=config/",
-]
