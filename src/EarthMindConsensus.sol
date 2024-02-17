@@ -51,6 +51,7 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
 
     mapping(uint256 epoch => mapping(address => MinerProposal)) public minerProposals;
     mapping(uint256 epoch => mapping(address => TopMinersProposal)) public validatorProposals;
+    // mapping(uint256 epoch => )
 
     event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
     event ProposalRevealed(uint256 indexed epoch, address indexed miner, bool vote, string message);
@@ -130,6 +131,8 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         onlyValidators
         atStage(_epoch, Stage.RevealValidators)
     {
+        // TODO: duplicated miners
+
         // TODO: How do we know validators are passing miner addresses that are actually miners?
         // Maybe a merkle tree of miner addresses?
         TopMinersProposal storage topMinerProposal = validatorProposals[_epoch][msg.sender];
@@ -152,7 +155,32 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         topMinerProposal.minerAddresses = _minerAddresses;
 
         emit TopMinersProposalRevealed(_epoch, msg.sender, _minerAddresses);
+
+        // structure => epoch => miner => score
+        // As validators are revealing their scores, we add the scores for each miner...
     }
+
+    // consider that you cannot participate in voting decisions that were created before you entered...
+    // research the time frames for exists and enters
+    // epoch maybe as a dependency of the time? Yes time based...
+    // you cannot leave in the middle of an epoch....
+
+    // empty epochs are ok, like empty blocks
+    // like a measure of time to perhaps give rewards.....
+
+    // check chainlink
+    // our network (where does the token live)
+    // eigenlayer (software you are running, living on a p2p network)
+    // similar setup (like off chain network but on chain slashing) (eigenDA to determine the consensus has been achieved)
+
+    // Using Eigenlayer -> Means we are paying for security but we can give other tokens.....
+
+    // Plan: Options:
+
+    // PoA (Easier) (Consensus follow the leader) - V1
+
+    // Eigenlayer (till April)
+    // Own token (Getting integrated into exchanges)
 
     // Internal Functions
     function _requestGovernanceDecision(bytes memory _payload) internal {
@@ -197,9 +225,15 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(registry.DESTINATION_CHAIN()));
     }
 
-    function aggregateAndPropagateDecisionFromValidatorXToY() external {
-        // TODO: only when the decision has been taken....
-        // TODO compute scores
+    // miner 1 -> 10
+    // miner 2 -> 9
+    // miner 3 -> 8
+    function aggregateAndPropagateDecisionFromValidatorXToY(uint256 _hint) external {
+        // We have all scores
+
+        // Take the top 10 miners
+
+        // Propagate the decision result (all using Axelar)
     }
 
     // Modifiers
