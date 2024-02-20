@@ -22,3 +22,6 @@ lcov.info
 # Mac
 .DS_Store
 NOTES*
+
+# Foundry artifacts
+broadcast

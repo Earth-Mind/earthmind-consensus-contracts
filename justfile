@@ -20,3 +20,7 @@ deploy_local_contracts:
     just deploy_create2_deployer_l2
     just deploy_mock_gateway_l1
     just deploy_mock_gateway_l2
+
+coverage:
+    forge coverage --report lcov
+    genhtml lcov.info -o coverage --branch-coverage --ignore-errors category
