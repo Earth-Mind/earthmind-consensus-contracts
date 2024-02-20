@@ -21,6 +21,11 @@ contract BaseConsensusTest is BaseRegistryTest {
 
     // @dev We override the _setUp function to deploy the consensus contract and use the overriden _getConsensusAddress function.
     function _setUp() internal virtual override {
+        // @dev load the network id from the environment and get the configuration
+        uint256 networkId = vm.envUint("NETWORK_ID");
+
+        config = Configuration.getConfiguration(networkId);
+
         _deploy();
 
         earthMindConsensusInstance =
@@ -37,20 +42,20 @@ contract BaseConsensusTest is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", _protocolAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 
     function _registerMinerViaMessage(address _minerAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", _minerAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 
     function _registerValidatorViaMessage(address _validatorAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", _validatorAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 }

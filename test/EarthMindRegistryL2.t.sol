@@ -111,27 +111,27 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_unRegisterProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 
     function _registerProtocolViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 
     function _registerMinerViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", miner1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 
     function _registerValidatorViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", validator1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
     }
 }

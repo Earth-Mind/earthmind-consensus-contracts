@@ -5,3 +5,7 @@ libs = ["lib"]
 solc = "0.8.19"
 optimizer_runs = 1000
 optimiser = true
+
+[rpc_endpoints]
+anvil1 = "http://localhost:8555"
+anvil2 = "http://localhost:8556"

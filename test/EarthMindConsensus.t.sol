@@ -239,7 +239,7 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         vm.prank(protocol1.addr());
 
         earthMindConsensusInstance.execute(
-            commandId, Configuration.SOURCE_CHAIN, Strings.toHexString(protocol1.addr()), payload
+            commandId, config.sourceChain, Strings.toHexString(protocol1.addr()), payload
         );
     }
 }

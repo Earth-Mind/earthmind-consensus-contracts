@@ -3,3 +3,5 @@ forge-std/=lib/forge-std/src/
 @openzeppelin/=lib/openzeppelin-contracts/contracts/
 @contracts/=src/
 @config/=config/
+@constants=constants/
+@scripts=script/

@@ -88,9 +88,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit ValidatorUnregistered(validator1.addr());
 
-        earthMindL1.execute(
-            commandId, Configuration.DESTINATION_CHAIN, Strings.toHexString(address(earthMindL2)), payload
-        );
+        earthMindL1.execute(commandId, config.destinationChain, Strings.toHexString(address(earthMindL2)), payload);
     }
 
     function test_MinerUnregister_whenL2Messages() public {
@@ -104,8 +102,6 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit MinerUnregistered(miner1.addr());
 
-        earthMindL1.execute(
-            commandId, Configuration.DESTINATION_CHAIN, Strings.toHexString(address(earthMindL2)), payload
-        );
+        earthMindL1.execute(commandId, config.destinationChain, Strings.toHexString(address(earthMindL2)), payload);
     }
 }

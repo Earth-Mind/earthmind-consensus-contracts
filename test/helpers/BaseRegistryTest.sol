@@ -41,8 +41,13 @@ contract BaseRegistryTest is BaseTest {
     // Mock
     MockProvider internal axelarGatewayMock;
     MockProvider internal axelarGasServiceMock;
+    Configuration.ConfigValues internal config;
 
     function _setUp() internal virtual {
+        uint256 networkId = vm.envUint("NETWORK_ID");
+
+        config = Configuration.getConfiguration(networkId);
+
         _deploy();
 
         _setupAccounts();
@@ -80,8 +85,7 @@ contract BaseRegistryTest is BaseTest {
             abi.encode(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address registryL1ComputedAddress =
-            create2Deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL1));
+        address registryL1ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL1));
         console.log("The RegistryL1 address: %s", registryL1ComputedAddress);
 
         // calculate the address of the RegistryL2 contract
@@ -90,21 +94,17 @@ contract BaseRegistryTest is BaseTest {
             abi.encode(address(crosschainSetup), address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address registryL2ComputedAddress =
-            create2Deployer.computeAddress(Configuration.SALT, keccak256(creationCodeL2));
+        address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
         console.log("The RegistryL2 address: %s", registryL2ComputedAddress);
 
         // setup the crosschain setup contract with the addresses of the registry contracts
         crosschainSetup.setup(
-            Configuration.SOURCE_CHAIN,
-            Configuration.DESTINATION_CHAIN,
-            registryL1ComputedAddress,
-            registryL2ComputedAddress
+            config.sourceChain, config.destinationChain, registryL1ComputedAddress, registryL2ComputedAddress
         );
 
         // deploy the registry contracts
-        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, Configuration.SALT, creationCodeL1);
-        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, Configuration.SALT, creationCodeL2);
+        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, config.salt, creationCodeL1);
+        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, config.salt, creationCodeL2);
 
         earthMindL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
         earthMindL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
