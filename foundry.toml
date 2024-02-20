@@ -6,6 +6,8 @@ solc = "0.8.19"
 optimizer_runs = 1000
 optimiser = true
 
+fs_permissions = [{ access = "read-write", path = "./" }]
+
 [rpc_endpoints]
 anvil1 = "http://localhost:8555"
 anvil2 = "http://localhost:8556"

@@ -20,7 +20,6 @@ contract DeployCreate2DeployerScript is BaseScript {
         console2.log("Create2Deployer Address");
         console2.logAddress(address(create2Deployer));
 
-        // export the address of Create2Deployer
-        // TODO
+        _exportDeployment("Create2Deployer", address(create2Deployer));
     }
 }
