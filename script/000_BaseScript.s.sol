@@ -1,8 +1,9 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Script} from "forge-std/Script.sol";
 import {Configuration} from "@config/Configuration.sol";
+
+import {Script} from "forge-std/Script.sol";
 
 contract BaseScript is Script {
     Configuration.ConfigValues internal config;
@@ -23,5 +24,9 @@ contract BaseScript is Script {
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC"), 0);
 
         return vm.rememberKey(deployerPrivateKey);
+    }
+
+    function _loadCreate2DeployerAddress() internal view returns (address) {
+        return address(0);
     }
 }

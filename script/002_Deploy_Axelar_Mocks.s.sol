@@ -1,25 +1,30 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-// import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
-// import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
+import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 
-// import {Configuration} from "@config/Configuration.sol";
+import {BaseScript} from "./000_BaseScript.s.sol";
 
-// import {Script, console2} from "forge-std/Script.sol";
+import {console2} from "forge-std/Script.sol";
 
-// contract DeployAxelarMockScript is Script {
-//     function run() public {
-//         vm.broadcast();
+contract DeployAxelarMockScript is BaseScript {
+    function run() public {
+        console2.log("Deploying AxelarMockGateway contract");
+        console2.log("Deployer Address");
+        console2.logAddress(deployer);
 
-//         Create2Deployer create2Deployer = new Create2Deployer();
+        vm.startBroadcast(deployer);
 
-//         // calculate the address of mock gateway
-//         bytes memory mockGatewayCreationCode = abi.encodePacked(type(MockGateway).creationCode);
+        Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
 
-//         address mockGatewayComputedAddress =
-//             create2Deployer.computeAddress(Configuration.SALT, keccak256(mockGatewayCreationCode));
+        // calculate the address of mock gateway
+        bytes memory mockGatewayCreationCode = abi.encodePacked(type(MockGateway).creationCode);
 
-//         console2.logAddress(mockGatewayComputedAddress);
-//     }
-// }
+        address mockGatewayComputedAddress =
+            create2Deployer.computeAddress(config.salt, keccak256(mockGatewayCreationCode));
+
+        console2.log("Computed address of MockGateway");
+        console2.logAddress(mockGatewayComputedAddress);
+    }
+}
