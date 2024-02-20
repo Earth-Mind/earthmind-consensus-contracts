@@ -3,8 +3,6 @@ set export
 
 # contract deployments
 deploy_create2_deployer_l1 NETWORK_ID JSON_RPC_URL:
-    echo "Deploying Create2Deployer to $NETWORK_ID"
-    echo "Using RPC URL: $JSON_RPC_URL"
     forge script script/001_Deploy_Create2Deployer.s.sol:DeployCreate2DeployerScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --broadcast --ffi -vvvv
 
 deploy_create2_deployer_l2 NETWORK_ID JSON_RPC_URL:
