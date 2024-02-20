@@ -18,8 +18,7 @@ contract BaseScript is Script {
     string internal folderPath;
 
     constructor() {
-        uint256 networkId = vm.envUint("NETWORK_ID");
-
+        string memory networkId = vm.envString("NETWORK_ID");
         config = _loadConfig(networkId);
         deployer = _loadDeployerInfo();
 
@@ -27,11 +26,10 @@ contract BaseScript is Script {
         string memory root = vm.projectRoot();
         deploymentsPath = string.concat(root, "/deployments/");
 
-        string memory chainIdStr = vm.toString(networkId);
-        folderPath = string.concat(deploymentsPath, chainIdStr);
+        folderPath = string.concat(deploymentsPath, networkId);
     }
 
-    function _loadConfig(uint256 _networkId) private pure returns (Configuration.ConfigValues memory) {
+    function _loadConfig(string memory _networkId) private pure returns (Configuration.ConfigValues memory) {
         return Configuration.getConfiguration(_networkId);
     }
 

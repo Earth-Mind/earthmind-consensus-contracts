@@ -44,7 +44,7 @@ contract BaseRegistryTest is BaseTest {
     Configuration.ConfigValues internal config;
 
     function _setUp() internal virtual {
-        uint256 networkId = vm.envUint("NETWORK_ID");
+        string memory networkId = vm.envString("NETWORK_ID");
 
         config = Configuration.getConfiguration(networkId);
 

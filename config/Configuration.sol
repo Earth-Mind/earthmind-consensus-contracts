@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {ConfigurationLocal} from "./Configuration.local.sol";
+import {ConfigurationL1Local} from "./Configuration.local.sol";
+import {ConfigurationL2Local} from "./Configuration.local.sol";
+
 import {ConfigurationMainnet} from "./Configuration.mainnet.sol";
 import {ConfigurationTestnet} from "./Configuration.testnet.sol";
 
@@ -16,17 +18,21 @@ library Configuration {
         address axelarGasService;
     }
 
-    function getConfiguration(uint256 _networkId) external pure returns (ConfigValues memory) {
-        if (_networkId == Constants.MAINNET_NETWORK) {
+    function getConfiguration(string memory _networkId) external pure returns (ConfigValues memory) {
+        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.MAINNET_NETWORK))) {
             return ConfigurationMainnet.getConfig();
         }
 
-        if (_networkId == Constants.TESTNET_NETWORK) {
+        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.TESTNET_NETWORK))) {
             return ConfigurationTestnet.getConfig();
         }
 
-        if (_networkId == Constants.LOCAL_NETWORK) {
-            return ConfigurationLocal.getConfig();
+        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_L1_NETWORK))) {
+            return ConfigurationL1Local.getConfig();
+        }
+
+        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_L2_NETWORK))) {
+            return ConfigurationL2Local.getConfig();
         }
 
         revert("Configuration: network not supported");

@@ -22,7 +22,7 @@ contract BaseConsensusTest is BaseRegistryTest {
     // @dev We override the _setUp function to deploy the consensus contract and use the overriden _getConsensusAddress function.
     function _setUp() internal virtual override {
         // @dev load the network id from the environment and get the configuration
-        uint256 networkId = vm.envUint("NETWORK_ID");
+        string memory networkId = vm.envString("NETWORK_ID");
 
         config = Configuration.getConfiguration(networkId);
 
