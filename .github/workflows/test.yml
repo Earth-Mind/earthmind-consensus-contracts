@@ -30,5 +30,5 @@ jobs:
 
       - name: Run Forge tests
         run: |
-          forge test -vvv
+          just test_unit
         id: test
