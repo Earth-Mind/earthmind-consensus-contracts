@@ -25,8 +25,8 @@ import "forge-std/console.sol";
 // It also includes virtual functions that can be overwritten by the test contract.
 contract BaseRegistryTest is BaseTest {
     Create2Deployer internal create2Deployer;
-    EarthMindRegistryL1 internal earthMindL1;
-    EarthMindRegistryL2 internal earthMindL2;
+    EarthMindRegistryL1 internal earthMindRegistryL1;
+    EarthMindRegistryL2 internal earthMindRegistryL2;
     CrossChainSetup internal crosschainSetup;
     EarthMindToken internal earthMindTokenInstance;
 
@@ -58,9 +58,13 @@ contract BaseRegistryTest is BaseTest {
         miner1 = new Miner("miner_1", vm);
         protocol1 = new Protocol("protocol_1", vm);
 
-        miner1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
-        validator1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
-        protocol1.init(earthMindL1, earthMindL2, earthMindTokenInstance, _getConsensusAddress(), DEPLOYER);
+        address consensusAddress = _getConsensusAddress();
+
+        miner1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindTokenInstance, consensusAddress, DEPLOYER);
+
+        validator1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindTokenInstance, consensusAddress, DEPLOYER);
+
+        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindTokenInstance, consensusAddress, DEPLOYER);
     }
 
     function _getConsensusAddress() internal view virtual returns (address) {
@@ -106,8 +110,8 @@ contract BaseRegistryTest is BaseTest {
         address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, config.salt, creationCodeL1);
         address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, config.salt, creationCodeL2);
 
-        earthMindL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
-        earthMindL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
+        earthMindRegistryL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
+        earthMindRegistryL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
 
         vm.stopPrank();
     }

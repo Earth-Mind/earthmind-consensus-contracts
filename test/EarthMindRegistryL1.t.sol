@@ -42,7 +42,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         protocol1.registerProtocol{value: 1 ether}();
 
-        assertEq(earthMindL1.protocols(protocol1.addr()), true);
+        assertEq(earthMindRegistryL1.protocols(protocol1.addr()), true);
     }
 
     function test_ProtocolUnRegister() public {
@@ -54,7 +54,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         protocol1.unRegisterProtocol{value: 1 ether}();
 
-        assertEq(earthMindL1.protocols(protocol1.addr()), false);
+        assertEq(earthMindRegistryL1.protocols(protocol1.addr()), false);
     }
 
     function test_MinerRegister() public {
@@ -64,7 +64,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         miner1.registerMiner{value: 1 ether}();
 
-        assertEq(earthMindL1.miners(miner1.addr()), true);
+        assertEq(earthMindRegistryL1.miners(miner1.addr()), true);
     }
 
     function test_ValidatorRegister() public {
@@ -74,7 +74,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         validator1.registerValidator{value: 1 ether}();
 
-        assertEq(earthMindL1.validators(validator1.addr()), true);
+        assertEq(earthMindRegistryL1.validators(validator1.addr()), true);
     }
 
     function test_ValidatorUnregister_whenL2Messages() public {
@@ -88,7 +88,9 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit ValidatorUnregistered(validator1.addr());
 
-        earthMindL1.execute(commandId, config.destinationChain, Strings.toHexString(address(earthMindL2)), payload);
+        earthMindRegistryL1.execute(
+            commandId, config.destinationChain, Strings.toHexString(address(earthMindRegistryL2)), payload
+        );
     }
 
     function test_MinerUnregister_whenL2Messages() public {
@@ -102,6 +104,8 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit MinerUnregistered(miner1.addr());
 
-        earthMindL1.execute(commandId, config.destinationChain, Strings.toHexString(address(earthMindL2)), payload);
+        earthMindRegistryL1.execute(
+            commandId, config.destinationChain, Strings.toHexString(address(earthMindRegistryL2)), payload
+        );
     }
 }

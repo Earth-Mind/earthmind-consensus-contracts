@@ -29,7 +29,7 @@ contract BaseConsensusTest is BaseRegistryTest {
         _deploy();
 
         earthMindConsensusInstance =
-            new EarthMindConsensus(address(earthMindL2), address(axelarGatewayMock), address(axelarGasServiceMock));
+        new EarthMindConsensus(address(earthMindRegistryL2), address(axelarGatewayMock), address(axelarGasServiceMock));
 
         _setupAccounts();
     }
@@ -42,20 +42,26 @@ contract BaseConsensusTest is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", _protocolAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 
     function _registerMinerViaMessage(address _minerAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", _minerAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 
     function _registerValidatorViaMessage(address _validatorAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", _validatorAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 }

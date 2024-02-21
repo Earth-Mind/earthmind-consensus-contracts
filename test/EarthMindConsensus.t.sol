@@ -41,7 +41,7 @@ contract EarthMindConsensusTest is BaseConsensusTest {
     }
 
     function test_initialProperties() public {
-        assertEq(address(earthMindConsensusInstance.registry()), address(earthMindL2));
+        assertEq(address(earthMindConsensusInstance.registry()), address(earthMindRegistryL2));
 
         // assert that the total epochs are 0
         assertEq(earthMindConsensusInstance.totalEpochs(), 0);
@@ -68,13 +68,13 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         assertEq(earthMindConsensusInstance.getSettlementPeriod(), SETTLEMENT_PERIOD);
 
         // assert validator exists
-        assertEq(earthMindL2.validators(validator1.addr()), true);
+        assertEq(earthMindRegistryL2.validators(validator1.addr()), true);
 
         // assert miner exists
-        assertEq(earthMindL2.miners(miner1.addr()), true);
+        assertEq(earthMindRegistryL2.miners(miner1.addr()), true);
 
         // assert protocol exists
-        assertEq(earthMindL2.protocols(protocol1.addr()), true);
+        assertEq(earthMindRegistryL2.protocols(protocol1.addr()), true);
 
         // assert that the miner has no proposal
         (bytes32 proposalHash,,,) = earthMindConsensusInstance.minerProposals(0, miner1.addr());

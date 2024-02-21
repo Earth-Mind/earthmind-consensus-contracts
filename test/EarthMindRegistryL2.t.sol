@@ -47,7 +47,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         _registerProtocolViaMessage();
 
-        assertEq(earthMindL2.protocols(protocol1.addr()), true);
+        assertEq(earthMindRegistryL2.protocols(protocol1.addr()), true);
     }
 
     function test_unRegisterProtocol_whenReceivingMessage() public {
@@ -59,7 +59,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         _unRegisterProtocolViaMessage();
 
-        assertEq(earthMindL2.protocols(protocol1.addr()), false);
+        assertEq(earthMindRegistryL2.protocols(protocol1.addr()), false);
     }
 
     function test_registerValidator_whenReceivingMessage() public {
@@ -69,7 +69,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         _registerValidatorViaMessage();
 
-        assertEq(earthMindL2.validators(validator1.addr()), true);
+        assertEq(earthMindRegistryL2.validators(validator1.addr()), true);
     }
 
     function test_registerMiner_whenReceivingMessage() public {
@@ -79,7 +79,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         _registerMinerViaMessage();
 
-        assertEq(earthMindL2.miners(miner1.addr()), true);
+        assertEq(earthMindRegistryL2.miners(miner1.addr()), true);
     }
 
     // External functions
@@ -92,7 +92,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         miner1.unRegisterMiner{value: 1 ether}();
 
-        assertEq(earthMindL1.miners(miner1.addr()), false);
+        assertEq(earthMindRegistryL1.miners(miner1.addr()), false);
     }
 
     function test_ValidatorUnRegister() public {
@@ -104,34 +104,42 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         validator1.unRegisterValidator{value: 1 ether}();
 
-        assertEq(earthMindL1.validators(validator1.addr()), false);
+        assertEq(earthMindRegistryL1.validators(validator1.addr()), false);
     }
 
     function _unRegisterProtocolViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_unRegisterProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 
     function _registerProtocolViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 
     function _registerMinerViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", miner1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 
     function _registerValidatorViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", validator1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindL2.execute(commandId, config.sourceChain, Strings.toHexString(address(earthMindL1)), payload);
+        earthMindRegistryL2.execute(
+            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
+        );
     }
 }
