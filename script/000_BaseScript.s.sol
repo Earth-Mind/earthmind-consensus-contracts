@@ -67,6 +67,20 @@ contract BaseScript is Script {
         return result;
     }
 
+    function _loadRegistryL2Address() internal view returns (address) {
+        console2.log("Loading EarthMindRegistryL2 address");
+
+        string memory filePath = string.concat(folderPath, "/EarthMindRegistryL2.json");
+        string memory jsonData = vm.readFile(filePath);
+
+        bytes memory json = vm.parseJson(jsonData, ".address");
+        address result = abi.decode(json, (address));
+
+        console2.log("EarthMindRegistryL2 address", result);
+
+        return result;
+    }
+
     function _exportDeployment(string memory _name, address _addr) internal {
         console2.log("Exporting deployment");
 
