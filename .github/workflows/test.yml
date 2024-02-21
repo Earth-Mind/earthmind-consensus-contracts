@@ -11,7 +11,7 @@ env:
   CHAIN2_URL: http://localhost:8556
   CHAIN1_ID: 31337
   CHAIN2_ID: 31338
-  SENDER: 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  SENDER: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
 
 jobs:
   check:
@@ -28,6 +28,11 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+      
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
 
       - name: Run Forge build
         run: |
@@ -36,4 +41,4 @@ jobs:
 
       - name: Run Forge tests
         run: |
-          forge test -vvvv
+          just test_unit
