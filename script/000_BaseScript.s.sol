@@ -53,6 +53,20 @@ contract BaseScript is Script {
         return result;
     }
 
+    function _loadCrosschainSetupAddress() internal view returns (address) {
+        console2.log("Loading CrosschainSetup address");
+
+        string memory filePath = string.concat(folderPath, "/CrossChainSetup.json");
+        string memory jsonData = vm.readFile(filePath);
+
+        bytes memory json = vm.parseJson(jsonData, ".address");
+        address result = abi.decode(json, (address));
+
+        console2.log("CrossChainSetup address", result);
+
+        return result;
+    }
+
     function _exportDeployment(string memory _name, address _addr) internal {
         console2.log("Exporting deployment");
 
