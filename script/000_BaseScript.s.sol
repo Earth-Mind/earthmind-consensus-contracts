@@ -48,7 +48,7 @@ contract BaseScript is Script {
         bytes memory json = vm.parseJson(jsonData, ".address");
         address result = abi.decode(json, (address));
 
-        console2.log("Create2Deployer address {}", result);
+        console2.log("Create2Deployer address", result);
 
         return result;
     }

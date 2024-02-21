@@ -27,6 +27,11 @@ contract DeployAxelarMockScript is BaseScript {
         console2.log("Computed address of MockGateway");
         console2.logAddress(mockGatewayComputedAddress);
 
-        _exportDeployment("MockGateway", address(mockGatewayComputedAddress));
+        // deploy the mock gateway contract
+        address deployedAddressOfMockGateway = create2Deployer.deploy(0, config.salt, mockGatewayCreationCode);
+
+        assert(deployedAddressOfMockGateway == mockGatewayComputedAddress);
+
+        _exportDeployment("MockGateway", deployedAddressOfMockGateway);
     }
 }

@@ -2,25 +2,19 @@
 pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
-import {EarthMindToken} from "@contracts/EarthMindToken.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
-import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
 
-contract DeployCoreScript is BaseScript {
-    EarthMindToken internal earthMindTokenInstance;
+contract DeployCrossChainSetupScript is BaseScript {
     CrossChainSetup internal crosschainSetup;
-    EarthMindRegistryL1 internal earthMindL1;
-    EarthMindRegistryL2 internal earthMindL2;
-    EarthMindConsensus internal earthMindConsensusInstance;
 
     function run() public {
-        console2.log("Deploying Core contracts");
+        console2.log("Deploying CrossChainSetup contract");
         console2.log("Deployer Address");
         console2.logAddress(deployer);
 
@@ -28,8 +22,15 @@ contract DeployCoreScript is BaseScript {
 
         Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
 
-        earthMindTokenInstance = new EarthMindToken();
+        // calculate the address of the crosschain setup contract
+        bytes memory creationCode = abi.encodePacked(type(CrossChainSetup).creationCode);
 
+        address computedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCode));
+
+        console2.log("Computed address of CrossChainSetup");
+        console2.logAddress(computedAddress);
+
+        // deploy it using create2
         crosschainSetup = new CrossChainSetup();
 
         // calculate the address of the RegistryL1 contract
@@ -53,18 +54,11 @@ contract DeployCoreScript is BaseScript {
             config.sourceChain, config.destinationChain, registryL1ComputedAddress, registryL2ComputedAddress
         );
 
-        // deploy the registry contracts
-        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, config.salt, creationCodeL1);
-        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, config.salt, creationCodeL2);
+        // deploy the crosschain setup contract
+        address deployedAddressOfCrossChainSetup = create2Deployer.deploy(0, config.salt, creationCode);
 
-        earthMindL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
-        earthMindL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
+        assert(deployedAddressOfCrossChainSetup == computedAddress);
 
-        // deploy consensus contract
-        earthMindConsensusInstance = new EarthMindConsensus(
-                    address(earthMindL2),
-                    config.axelarGateway,
-                    config.axelarGasService
-                );
+        _exportDeployment("CrossChainSetup", deployedAddressOfCrossChainSetup);
     }
 }
