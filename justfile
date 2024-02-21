@@ -4,8 +4,9 @@ set export
 # @dev used to be able to do $L1 and differentiate parameters in the recipes
 L1 := "L1"
 L2 := "L2"
+NETWORK_ID := env_var('CHAIN1_ID')
 
-# @dev Be aware that NETWORK_ID is a parameters that will become an environment variable that thanks to set export.
+# @dev Be aware that NETWORK_ID will become an environment variable that thanks to set export.
 # So the recipes require the NETWORK_ID in order to work properly.
 
 # contract deployments
@@ -28,6 +29,7 @@ deploy_consensus NETWORK_ID JSON_RPC_URL:
     forge script script/005_Deploy_Consensus.s.sol:DeployConsensusScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
 
 deploy_local_contracts:
+    echo "Deploying contracts locally"
     just deploy_create2_deployer $CHAIN1_ID $CHAIN1_URL # L1
     just deploy_create2_deployer $CHAIN2_ID $CHAIN2_URL # L2
     just deploy_mock_gateway $CHAIN1_ID $CHAIN1_URL # L1
@@ -39,6 +41,10 @@ deploy_local_contracts:
     just deploy_consensus $CHAIN2_ID $CHAIN2_URL # L2
 
 # orchestration and testing
-coverage:
+test_unit:
+    echo "Running unit tests"
+    forge test -vvvv
+
+test_coverage:
     forge coverage --report lcov
     genhtml lcov.info -o coverage --branch-coverage --ignore-errors category

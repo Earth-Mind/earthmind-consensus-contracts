@@ -8,6 +8,7 @@ import {ConfigurationMainnet} from "./Configuration.mainnet.sol";
 import {ConfigurationTestnet} from "./Configuration.testnet.sol";
 
 import {Constants} from "@constants/Constants.sol";
+import {console2} from "forge-std/Script.sol";
 
 library Configuration {
     struct ConfigValues {
@@ -34,6 +35,8 @@ library Configuration {
         if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_L2_NETWORK))) {
             return ConfigurationL2Local.getConfig();
         }
+
+        console2.log("Configuration: network not supported {}", _networkId);
 
         revert("Configuration: network not supported");
     }
