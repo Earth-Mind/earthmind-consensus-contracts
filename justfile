@@ -49,3 +49,8 @@ test_coverage:
     forge coverage --report lcov
     lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script'
     genhtml lcov.info -o coverage --branch-coverage --ignore-errors category
+
+test_integration:
+    echo "Running integration tests"
+    just deploy_local_contracts
+    forge test --match-path "*/integration/*.sol" -vvvv
