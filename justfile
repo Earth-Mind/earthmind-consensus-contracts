@@ -47,4 +47,5 @@ test_unit:
 
 test_coverage:
     forge coverage --report lcov
+    lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script'
     genhtml lcov.info -o coverage --branch-coverage --ignore-errors category
