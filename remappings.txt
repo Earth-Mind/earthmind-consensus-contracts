@@ -5,3 +5,4 @@ forge-std/=lib/forge-std/src/
 @config/=config/
 @constants=constants/
 @scripts=script/
+@utils/=utils/
