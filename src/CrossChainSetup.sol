@@ -14,7 +14,7 @@ contract CrossChainSetup is Ownable {
         address registryL2;
     }
 
-    SetupData public setupData;
+    SetupData private setupData;
     bool public initialised;
 
     constructor() {
