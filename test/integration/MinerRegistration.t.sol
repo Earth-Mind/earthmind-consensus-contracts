@@ -1,22 +1,42 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
-
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
-contract MinerRegistrationIntegrationTest is BaseRegistryTest {
+import {BaseIntegrationTest} from "../helpers/BaseIntegrationTest.sol";
+
+import {console2} from "forge-std/console2.sol";
+import {Vm} from "forge-std/Vm.sol";
+
+contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
+    using DeploymentUtils for Vm;
+
     MockGateway internal mockGateway;
 
-    function setUp() public {
-        // _setUp();
+    string public constant NETWORK_L1 = "31337";
+    string public constant NETWORK_L2 = "31338";
 
-        mockGateway = new MockGateway();
+    uint256 networkL1;
+    uint256 networkL2;
+
+    function setUp() public {
+        networkL1 = vm.createFork("http://localhost:8555");
+        networkL2 = vm.createFork("http://localhost:8556");
+
+        address gatewayAddress = vm.loadDeploymentAddress(NETWORK_L1, "MockGateway");
+        mockGateway = MockGateway(gatewayAddress);
     }
 
     function test_MinerRegister() public {
+        vm.selectFork(networkL1);
+
+        bool otherResult = mockGateway.validateContractCall(bytes32(0), "", "", bytes32(0));
+
+        assertEq(otherResult, true);
+
         // miner1.registerMiner{value: 1 ether}();
-        assertEq(true, true);
+
         // assertEq(earthMindRegistryL1.miners(miner1.addr()), true);
     }
 }
