@@ -5,12 +5,16 @@ import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract DeployCrossChainSetupScript is BaseScript {
+    using DeploymentUtils for Vm;
+
     CrossChainSetup internal crosschainSetup;
 
     function run() public {
@@ -59,6 +63,6 @@ contract DeployCrossChainSetupScript is BaseScript {
 
         assert(deployedAddressOfCrossChainSetup == computedAddress);
 
-        _exportDeployment("CrossChainSetup", deployedAddressOfCrossChainSetup);
+        vm.saveDeploymentAddress("CrossChainSetup", deployedAddressOfCrossChainSetup);
     }
 }

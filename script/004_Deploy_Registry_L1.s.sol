@@ -3,12 +3,16 @@ pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract DeployRegistryL1Script is BaseScript {
+    using DeploymentUtils for Vm;
+
     function run() public {
         console2.log("Deploying Registry L1 contracts");
         console2.log("Deployer Address");
@@ -36,6 +40,6 @@ contract DeployRegistryL1Script is BaseScript {
 
         assert(deployedAddressOfRegistryL1 == registryL1ComputedAddress);
 
-        _exportDeployment("EarthMindRegistryL1", deployedAddressOfRegistryL1);
+        vm.saveDeploymentAddress("EarthMindRegistryL1", deployedAddressOfRegistryL1);
     }
 }

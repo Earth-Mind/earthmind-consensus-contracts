@@ -3,12 +3,16 @@ pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract DeployConsensusScript is BaseScript {
+    using DeploymentUtils for Vm;
+
     EarthMindConsensus internal earthMindConsensusInstance;
 
     function run() public {
@@ -37,6 +41,6 @@ contract DeployConsensusScript is BaseScript {
 
         assert(deployedAddressOfConsensus == consensusComputedAddress);
 
-        _exportDeployment("EarthMindConsensus", deployedAddressOfConsensus);
+        vm.saveDeploymentAddress("EarthMindConsensus", deployedAddressOfConsensus);
     }
 }

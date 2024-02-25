@@ -3,12 +3,16 @@ pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract DeployCreate2DeployerScript is BaseScript {
+    using DeploymentUtils for Vm;
+
     function run() public {
         console2.log("Deploying Create2Deployer contract");
         console2.log("Deployer Address");
@@ -20,6 +24,6 @@ contract DeployCreate2DeployerScript is BaseScript {
         console2.log("Create2Deployer Address");
         console2.logAddress(address(create2Deployer));
 
-        _exportDeployment("Create2Deployer", address(create2Deployer));
+        vm.saveDeploymentAddress("Create2Deployer", address(create2Deployer));
     }
 }

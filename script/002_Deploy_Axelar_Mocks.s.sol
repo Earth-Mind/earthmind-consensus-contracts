@@ -3,12 +3,16 @@ pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
 import {console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract DeployAxelarMockScript is BaseScript {
+    using DeploymentUtils for Vm;
+
     function run() public {
         console2.log("Deploying AxelarMockGateway contract");
         console2.log("Deployer Address");
@@ -32,6 +36,6 @@ contract DeployAxelarMockScript is BaseScript {
 
         assert(deployedAddressOfMockGateway == mockGatewayComputedAddress);
 
-        _exportDeployment("MockGateway", deployedAddressOfMockGateway);
+        vm.saveDeploymentAddress("MockGateway", deployedAddressOfMockGateway);
     }
 }

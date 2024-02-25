@@ -40,12 +40,46 @@ library DeploymentUtils {
         return result;
     }
 
+    function loadDeploymentAddress(Vm vm, string memory _contractName) internal view returns (address) {
+        console2.log("Loading address");
+
+        string memory networkId = vm.envString("NETWORK_ID");
+
+        string memory folderPath = _getFolderPath(vm, networkId);
+
+        string memory filePath = string.concat(folderPath, "/", _contractName, ".json");
+        string memory jsonData = vm.readFile(filePath);
+
+        bytes memory json = vm.parseJson(jsonData, ".address");
+        address result = abi.decode(json, (address));
+
+        console2.log("Address loaded", result);
+
+        return result;
+    }
+
     function saveDeploymentAddress(Vm vm, string memory _networkId, string memory _contractName, address _address)
         internal
     {
         console2.log("Exporting deployment");
 
         string memory folderPath = _getFolderPath(vm, _networkId);
+
+        _createFolderIfNotExists(vm, folderPath);
+
+        string memory filePath = string.concat(folderPath, "/", _contractName, ".json");
+
+        string memory finalJson = vm.serializeAddress("address", "address", _address);
+
+        vm.writeJson(finalJson, filePath);
+    }
+
+    function saveDeploymentAddress(Vm vm, string memory _contractName, address _address) internal {
+        console2.log("Exporting deployment");
+
+        string memory networkId = vm.envString("NETWORK_ID");
+
+        string memory folderPath = _getFolderPath(vm, networkId);
 
         _createFolderIfNotExists(vm, folderPath);
 
