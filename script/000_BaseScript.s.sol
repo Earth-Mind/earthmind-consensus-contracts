@@ -2,10 +2,14 @@
 pragma solidity 0.8.19;
 
 import {Configuration} from "@config/Configuration.sol";
+import {DeployerUtils} from "@utils/DeployerUtils.sol";
 
 import {Script, console2} from "forge-std/Script.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 contract BaseScript is Script {
+    using DeployerUtils for Vm;
+
     Configuration.ConfigValues internal config;
     address internal deployer;
 
@@ -20,7 +24,7 @@ contract BaseScript is Script {
     constructor() {
         string memory networkId = vm.envString("NETWORK_ID");
         config = _loadConfig(networkId);
-        deployer = _loadDeployerInfo();
+        deployer = vm.loadDeployerAddress();
 
         // setup paths
         string memory root = vm.projectRoot();
@@ -33,72 +37,73 @@ contract BaseScript is Script {
         return Configuration.getConfiguration(_networkId);
     }
 
-    function _loadDeployerInfo() private returns (address) {
-        uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC"), 0);
+    // hacer esto una library
+    // function _loadDeployerInfo() private returns (address) {
+    //     uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC"), 0);
 
-        return vm.rememberKey(deployerPrivateKey);
-    }
+    //     return vm.rememberKey(deployerPrivateKey);
+    // }
 
-    function _loadCreate2DeployerAddress() internal view returns (address) {
-        console2.log("Loading Create2Deployer address");
+    // function _loadCreate2DeployerAddress() internal view returns (address) {
+    //     console2.log("Loading Create2Deployer address");
 
-        string memory filePath = string.concat(folderPath, "/Create2Deployer.json");
-        string memory jsonData = vm.readFile(filePath);
+    //     string memory filePath = string.concat(folderPath, "/Create2Deployer.json");
+    //     string memory jsonData = vm.readFile(filePath);
 
-        bytes memory json = vm.parseJson(jsonData, ".address");
-        address result = abi.decode(json, (address));
+    //     bytes memory json = vm.parseJson(jsonData, ".address");
+    //     address result = abi.decode(json, (address));
 
-        console2.log("Create2Deployer address", result);
+    //     console2.log("Create2Deployer address", result);
 
-        return result;
-    }
+    //     return result;
+    // }
 
-    function _loadCrosschainSetupAddress() internal view returns (address) {
-        console2.log("Loading CrosschainSetup address");
+    // function _loadCrosschainSetupAddress() internal view returns (address) {
+    //     console2.log("Loading CrosschainSetup address");
 
-        string memory filePath = string.concat(folderPath, "/CrossChainSetup.json");
-        string memory jsonData = vm.readFile(filePath);
+    //     string memory filePath = string.concat(folderPath, "/CrossChainSetup.json");
+    //     string memory jsonData = vm.readFile(filePath);
 
-        bytes memory json = vm.parseJson(jsonData, ".address");
-        address result = abi.decode(json, (address));
+    //     bytes memory json = vm.parseJson(jsonData, ".address");
+    //     address result = abi.decode(json, (address));
 
-        console2.log("CrossChainSetup address", result);
+    //     console2.log("CrossChainSetup address", result);
 
-        return result;
-    }
+    //     return result;
+    // }
 
-    function _loadRegistryL2Address() internal view returns (address) {
-        console2.log("Loading EarthMindRegistryL2 address");
+    // function _loadRegistryL2Address() internal view returns (address) {
+    //     console2.log("Loading EarthMindRegistryL2 address");
 
-        string memory filePath = string.concat(folderPath, "/EarthMindRegistryL2.json");
-        string memory jsonData = vm.readFile(filePath);
+    //     string memory filePath = string.concat(folderPath, "/EarthMindRegistryL2.json");
+    //     string memory jsonData = vm.readFile(filePath);
 
-        bytes memory json = vm.parseJson(jsonData, ".address");
-        address result = abi.decode(json, (address));
+    //     bytes memory json = vm.parseJson(jsonData, ".address");
+    //     address result = abi.decode(json, (address));
 
-        console2.log("EarthMindRegistryL2 address", result);
+    //     console2.log("EarthMindRegistryL2 address", result);
 
-        return result;
-    }
+    //     return result;
+    // }
 
-    function _exportDeployment(string memory _name, address _addr) internal {
-        console2.log("Exporting deployment");
+    // function _exportDeployment(string memory _name, address _addr) internal {
+    //     console2.log("Exporting deployment");
 
-        console2.log("Creating directory if it doesn't exists", folderPath);
+    //     console2.log("Creating directory if it doesn't exists", folderPath);
 
-        string[] memory inputs = new string[](3);
-        inputs[0] = "mkdir";
-        inputs[1] = "-p";
-        inputs[2] = folderPath;
+    //     string[] memory inputs = new string[](3);
+    //     inputs[0] = "mkdir";
+    //     inputs[1] = "-p";
+    //     inputs[2] = folderPath;
 
-        vm.ffi(inputs);
+    //     vm.ffi(inputs);
 
-        console2.log("Exporting deployment");
+    //     console2.log("Exporting deployment");
 
-        string memory filePath = string.concat(folderPath, "/", _name, ".json");
+    //     string memory filePath = string.concat(folderPath, "/", _name, ".json");
 
-        string memory finalJson = vm.serializeAddress("address", "address", _addr);
+    //     string memory finalJson = vm.serializeAddress("address", "address", _addr);
 
-        vm.writeJson(finalJson, filePath);
-    }
+    //     vm.writeJson(finalJson, filePath);
+    // }
 }

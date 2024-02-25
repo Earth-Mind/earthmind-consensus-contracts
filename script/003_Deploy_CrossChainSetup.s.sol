@@ -6,6 +6,7 @@ import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
@@ -24,7 +25,7 @@ contract DeployCrossChainSetupScript is BaseScript {
 
         vm.startBroadcast(deployer);
 
-        Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
+        Create2Deployer create2Deployer = Create2Deployer(vm.loadDeploymentAddress(Constants.CREATE2_DEPLOYER));
 
         // calculate the address of the crosschain setup contract
         bytes memory creationCode = abi.encodePacked(type(CrossChainSetup).creationCode);
@@ -63,6 +64,6 @@ contract DeployCrossChainSetupScript is BaseScript {
 
         assert(deployedAddressOfCrossChainSetup == computedAddress);
 
-        vm.saveDeploymentAddress("CrossChainSetup", deployedAddressOfCrossChainSetup);
+        vm.saveDeploymentAddress(Constants.CROSS_CHAIN_SETUP, deployedAddressOfCrossChainSetup);
     }
 }

@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
@@ -20,7 +21,7 @@ contract DeployAxelarMockScript is BaseScript {
 
         vm.startBroadcast(deployer);
 
-        Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
+        Create2Deployer create2Deployer = Create2Deployer(vm.loadDeploymentAddress(Constants.CREATE2_DEPLOYER));
 
         // calculate the address of mock gateway
         bytes memory mockGatewayCreationCode = abi.encodePacked(type(MockGateway).creationCode);
@@ -36,6 +37,6 @@ contract DeployAxelarMockScript is BaseScript {
 
         assert(deployedAddressOfMockGateway == mockGatewayComputedAddress);
 
-        vm.saveDeploymentAddress("MockGateway", deployedAddressOfMockGateway);
+        vm.saveDeploymentAddress(Constants.MOCK_GATEWAY, deployedAddressOfMockGateway);
     }
 }

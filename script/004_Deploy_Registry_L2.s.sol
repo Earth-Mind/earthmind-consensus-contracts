@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
@@ -20,9 +21,9 @@ contract DeployRegistryL2Script is BaseScript {
 
         vm.startBroadcast(deployer);
 
-        Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
+        Create2Deployer create2Deployer = Create2Deployer(vm.loadDeploymentAddress(Constants.CREATE2_DEPLOYER));
 
-        address crosschainSetupAddress = _loadCrosschainSetupAddress();
+        address crosschainSetupAddress = vm.loadDeploymentAddress(Constants.CROSS_CHAIN_SETUP);
 
         // calculate the address of the RegistryL2 contract
         bytes memory creationCodeL2 = abi.encodePacked(
@@ -40,6 +41,6 @@ contract DeployRegistryL2Script is BaseScript {
 
         assert(deployedAddressOfRegistryL2 == registryL2ComputedAddress);
 
-        vm.saveDeploymentAddress("EarthMindRegistryL2", deployedAddressOfRegistryL2);
+        vm.saveDeploymentAddress(Constants.EARTHMIND_REGISTRY_L2, deployedAddressOfRegistryL2);
     }
 }

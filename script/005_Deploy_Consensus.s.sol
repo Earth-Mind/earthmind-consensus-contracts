@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
@@ -22,9 +23,9 @@ contract DeployConsensusScript is BaseScript {
 
         vm.startBroadcast(deployer);
 
-        Create2Deployer create2Deployer = Create2Deployer(_loadCreate2DeployerAddress());
+        Create2Deployer create2Deployer = Create2Deployer(vm.loadDeploymentAddress(Constants.CREATE2_DEPLOYER));
 
-        address earthmindRegistryL2Address = _loadRegistryL2Address();
+        address earthmindRegistryL2Address = vm.loadDeploymentAddress(Constants.EARTHMIND_REGISTRY_L2);
 
         bytes memory consensusCreationCode = abi.encodePacked(
             type(EarthMindConsensus).creationCode,
@@ -41,6 +42,6 @@ contract DeployConsensusScript is BaseScript {
 
         assert(deployedAddressOfConsensus == consensusComputedAddress);
 
-        vm.saveDeploymentAddress("EarthMindConsensus", deployedAddressOfConsensus);
+        vm.saveDeploymentAddress(Constants.EARTHMIND_CONSENSUS, deployedAddressOfConsensus);
     }
 }
