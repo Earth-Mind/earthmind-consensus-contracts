@@ -1,43 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {MockGateway} from "@contracts/mocks/MockGateway.sol";
-import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+// import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+// import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
+// import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 
 import {BaseIntegrationTest} from "../helpers/BaseIntegrationTest.sol";
 
-import {console2} from "forge-std/console2.sol";
-import {Vm} from "forge-std/Vm.sol";
+// import {console2} from "forge-std/console2.sol";
 
 contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
-    using DeploymentUtils for Vm;
-
-    MockGateway internal mockGateway;
-
-    string public constant NETWORK_L1 = "31337";
-    string public constant NETWORK_L2 = "31338";
-
-    uint256 networkL1;
-    uint256 networkL2;
-
     function setUp() public {
-        networkL1 = vm.createFork("http://localhost:8555");
-        networkL2 = vm.createFork("http://localhost:8556");
-
-        address gatewayAddress = vm.loadDeploymentAddress(NETWORK_L1, "MockGateway");
-        mockGateway = MockGateway(gatewayAddress);
+        _setUp();
+        _setupAccounts();
+        // mockGatewayL1 = MockGateway(gatewayAddressL1);
+        // earthMindRegistryL1 = EarthMindRegistryL1(registryAddressL1);
+        // earthMindRegistryL2 = EarthMindRegistryL2(registryAddressL2);
     }
 
     function test_MinerRegister() public {
         vm.selectFork(networkL1);
 
-        bool otherResult = mockGateway.validateContractCall(bytes32(0), "", "", bytes32(0));
+        earthMindRegistryL1.registerMiner();
 
-        assertEq(otherResult, true);
-
-        // miner1.registerMiner{value: 1 ether}();
-
-        // assertEq(earthMindRegistryL1.miners(miner1.addr()), true);
+        // do tx to register miner
+        // bridge
+        // check that the miner is registered in L2
     }
 }
 
@@ -103,3 +91,7 @@ contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
 // Without smart contracts.....we can't do it
 // Light client that goes from Bittensor to NEAR
 //
+
+// NOTES
+// bool otherResult = mockGateway.validateContractCall(bytes32(0), "", "", bytes32(0));
+// assertEq(otherResult, true);
