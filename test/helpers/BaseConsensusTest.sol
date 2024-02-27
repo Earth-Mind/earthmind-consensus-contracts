@@ -29,7 +29,7 @@ contract BaseConsensusTest is BaseRegistryTest {
         _deploy();
 
         earthMindConsensusInstance =
-        new EarthMindConsensus(address(earthMindRegistryL2), address(axelarGatewayMock), address(axelarGasServiceMock));
+        new EarthMindConsensus(address(earthMindRegistryL2), address(earthMindTokenInstance), address(axelarGatewayMock), address(axelarGasServiceMock));
 
         _setupAccounts();
     }

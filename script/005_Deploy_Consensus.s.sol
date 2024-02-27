@@ -25,11 +25,11 @@ contract DeployConsensusScript is BaseScript {
 
         Create2Deployer create2Deployer = Create2Deployer(vm.loadDeploymentAddress(Constants.CREATE2_DEPLOYER));
 
-        address earthmindRegistryL2Address = vm.loadDeploymentAddress(Constants.EARTHMIND_REGISTRY_L2);
+        address crosschainSetupAddress = vm.loadDeploymentAddress(Constants.CROSS_CHAIN_SETUP);
 
         bytes memory consensusCreationCode = abi.encodePacked(
             type(EarthMindConsensus).creationCode,
-            abi.encode(earthmindRegistryL2Address, config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
+            abi.encode(crosschainSetupAddress, config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
         );
 
         address consensusComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(consensusCreationCode));

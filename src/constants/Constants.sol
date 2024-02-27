@@ -12,4 +12,5 @@ library Constants {
     string public constant EARTHMIND_CONSENSUS = "EarthMindConsensus";
     string public constant EARTHMIND_REGISTRY_L1 = "EarthMindRegistryL1";
     string public constant EARTHMIND_REGISTRY_L2 = "EarthMindRegistryL2";
+    string public constant EARTHMIND_TOKEN_REWARD = "EarthMindTokenReward";
 }

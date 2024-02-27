@@ -13,7 +13,7 @@ contract CrossChainSetupTest is Test {
 
     function setUp() public {
         vm.prank(deployer);
-        crossChainSetupInstance = new CrossChainSetup();
+        crossChainSetupInstance = new CrossChainSetup(deployer);
     }
 
     function test_initialProperties() public {
@@ -66,8 +66,10 @@ contract CrossChainSetupTest is Test {
         address registryL2 = vm.addr(3456);
         string memory sourceChain = "sourceChain";
         string memory destinationChain = "destinationChain";
+        address tokenRewards = vm.addr(4567);
 
         vm.expectRevert("Ownable: caller is not the owner");
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
+
+        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2, tokenRewards);
     }
 }

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {EarthMindToken} from "@contracts/EarthMindToken.sol";
+import {EarthMindTokenReward} from "@contracts/EarthMindTokenReward.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
@@ -11,7 +11,7 @@ import "forge-std/Vm.sol";
 contract Account {
     address public immutable addr;
 
-    EarthMindToken internal earthMindTokenInstance;
+    EarthMindTokenReward internal earthMindTokenInstance;
     EarthMindRegistryL1 internal earthMindRegistryL1Instance;
     EarthMindRegistryL2 internal earthMindRegistryL2Instance;
     EarthMindConsensus internal earthMindConsensusInstance;
@@ -34,8 +34,8 @@ contract Account {
     function init(
         EarthMindRegistryL1 _earthMindRegistryL1Instance,
         EarthMindRegistryL2 _earthMindRegistryL2Instance,
-        EarthMindToken _earthMindTokenInstance,
-        address _earthMindConsensusInstance,
+        EarthMindTokenReward _earthMindTokenInstance,
+        EarthMindConsensus _earthMindConsensusInstance,
         address _deployer // this is the address of the deployer contract
     ) public {
         require(!initialized, "Account already initialized");
@@ -59,7 +59,7 @@ contract Account {
         earthMindTokenInstance = _earthMindTokenInstance;
         earthMindRegistryL1Instance = _earthMindRegistryL1Instance;
         earthMindRegistryL2Instance = _earthMindRegistryL2Instance;
-        earthMindConsensusInstance = EarthMindConsensus(_earthMindConsensusInstance);
+        earthMindConsensusInstance = _earthMindConsensusInstance;
     }
 
     function refreshBalances() public {
