@@ -4,7 +4,6 @@ pragma solidity 0.8.19;
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
-import {EarthMindTokenReward} from "@contracts/EarthMindTokenReward.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 
 import {Configuration} from "@config/Configuration.sol";
@@ -29,7 +28,6 @@ contract BaseIntegrationTest is BaseTest {
 
     EarthMindRegistryL1 internal earthMindRegistryL1;
     EarthMindRegistryL2 internal earthMindRegistryL2;
-    EarthMindTokenReward internal earthMindToken;
     EarthMindConsensus internal earthMindConsensus;
 
     // Accounts
@@ -53,7 +51,6 @@ contract BaseIntegrationTest is BaseTest {
     address registryAddressL2;
 
     address consensusAddress;
-    address tokenRewardAddress;
 
     function _setUp() internal virtual {
         networkL1 = vm.createFork("http://localhost:8555");
@@ -67,12 +64,10 @@ contract BaseIntegrationTest is BaseTest {
         registryAddressL2 = vm.loadDeploymentAddress(NETWORK_L2, Constants.EARTHMIND_REGISTRY_L2);
 
         consensusAddress = vm.loadDeploymentAddress(NETWORK_L2, Constants.EARTHMIND_CONSENSUS);
-        tokenRewardAddress = vm.loadDeploymentAddress(NETWORK_L2, Constants.EARTHMIND_TOKEN_REWARD);
 
         // setup instances
         earthMindRegistryL1 = EarthMindRegistryL1(registryAddressL1);
         earthMindRegistryL2 = EarthMindRegistryL2(registryAddressL2);
-        earthMindToken = EarthMindTokenReward(tokenRewardAddress);
         earthMindConsensus = EarthMindConsensus(consensusAddress);
     }
 
@@ -81,11 +76,10 @@ contract BaseIntegrationTest is BaseTest {
         miner1 = new Miner("miner_1", vm);
         protocol1 = new Protocol("protocol_1", vm);
 
-        // TODO: Remove address 0 that refers to the EarthMindToken
-        miner1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindToken, earthMindConsensus, DEPLOYER);
+        miner1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
 
-        validator1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindToken, earthMindConsensus, DEPLOYER);
+        validator1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
 
-        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindToken, earthMindConsensus, DEPLOYER);
+        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
     }
 }

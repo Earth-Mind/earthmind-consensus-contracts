@@ -5,7 +5,6 @@ import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
-import {EarthMindTokenReward} from "@contracts/EarthMindTokenReward.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
@@ -56,21 +55,6 @@ contract DeployCrossChainSetupScript is BaseScript {
         );
         address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
 
-        // calculate the address of the Consensus contract
-        bytes memory consensusCreationCode = abi.encodePacked(
-            type(EarthMindConsensus).creationCode,
-            abi.encode(address(crosschainSetupComputedAddress), config.axelarGateway, config.axelarGasService)
-        );
-        address consensusComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(consensusCreationCode));
-
-        // calculate the address of the TokenReward contract
-        bytes memory tokenRewardsCreationCode = abi.encodePacked(
-            type(EarthMindTokenReward).creationCode,
-            abi.encode(consensusComputedAddress) // Encoding all constructor arguments
-        );
-        address tokenRewardComputedAddress =
-            create2Deployer.computeAddress(config.salt, keccak256(tokenRewardsCreationCode));
-
         // deploy the crosschain setup contract
         address deployedAddressOfCrossChainSetup = create2Deployer.deploy(0, config.salt, crosschainSetupCreationCode);
 
@@ -80,11 +64,7 @@ contract DeployCrossChainSetupScript is BaseScript {
 
         // setup the crosschain setup contract with the addresses of the registry contracts
         crosschainSetup.setup(
-            config.sourceChain,
-            config.destinationChain,
-            registryL1ComputedAddress,
-            registryL2ComputedAddress,
-            tokenRewardComputedAddress
+            config.sourceChain, config.destinationChain, registryL1ComputedAddress, registryL2ComputedAddress
         );
 
         vm.saveDeploymentAddress(Constants.CROSS_CHAIN_SETUP, deployedAddressOfCrossChainSetup);

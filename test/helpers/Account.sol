@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {EarthMindTokenReward} from "@contracts/EarthMindTokenReward.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
@@ -11,13 +10,12 @@ import "forge-std/Vm.sol";
 contract Account {
     address public immutable addr;
 
-    EarthMindTokenReward internal earthMindTokenInstance;
     EarthMindRegistryL1 internal earthMindRegistryL1Instance;
     EarthMindRegistryL2 internal earthMindRegistryL2Instance;
     EarthMindConsensus internal earthMindConsensusInstance;
 
-    uint256 public initialTokenBalance;
-    uint256 public currentTokenBalance;
+    uint256 public initialRewardsBalance;
+    uint256 public currentRewardsBalance;
 
     uint256 public initialETHBalance;
     uint256 public currentETHBalance;
@@ -34,32 +32,19 @@ contract Account {
     function init(
         EarthMindRegistryL1 _earthMindRegistryL1Instance,
         EarthMindRegistryL2 _earthMindRegistryL2Instance,
-        EarthMindTokenReward _earthMindTokenInstance,
-        EarthMindConsensus _earthMindConsensusInstance,
-        address _deployer // this is the address of the deployer contract
+        EarthMindConsensus _earthMindConsensusInstance
     ) public {
         require(!initialized, "Account already initialized");
         initialized = true;
 
-        // Send some tokens to the account
-        vm.startPrank(_deployer);
-        _earthMindTokenInstance.transfer(addr, 50_000 ether);
-        vm.stopPrank();
-
-        // Approve permissions to registry contract
-        vm.startPrank(addr);
-        _earthMindTokenInstance.approve(address(_earthMindRegistryL1Instance), 50_000 ether);
-        vm.stopPrank();
-
-        // Set initial balances
-        initialETHBalance = address(addr).balance;
-        initialTokenBalance = _earthMindTokenInstance.balanceOf(addr);
-
         // Set instances
-        earthMindTokenInstance = _earthMindTokenInstance;
         earthMindRegistryL1Instance = _earthMindRegistryL1Instance;
         earthMindRegistryL2Instance = _earthMindRegistryL2Instance;
         earthMindConsensusInstance = _earthMindConsensusInstance;
+
+        // Set initial balances
+        initialETHBalance = address(addr).balance;
+        initialRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
     }
 
     function refreshBalances() public {
@@ -67,7 +52,7 @@ contract Account {
     }
 
     function _refreshBalances() internal {
-        currentTokenBalance = earthMindTokenInstance.balanceOf(addr);
+        currentRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
         currentETHBalance = address(addr).balance;
     }
 

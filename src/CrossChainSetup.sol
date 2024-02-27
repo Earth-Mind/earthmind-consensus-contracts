@@ -12,7 +12,6 @@ contract CrossChainSetup is Ownable {
         string destinationChain;
         address registryL1;
         address registryL2;
-        address tokenReward;
     }
 
     SetupData private setupData;
@@ -28,8 +27,7 @@ contract CrossChainSetup is Ownable {
         string memory _sourceChain,
         string memory _destinationChain,
         address _registryL1,
-        address _registryL2,
-        address _tokenReward
+        address _registryL2
     ) external onlyOwner {
         if (initialised) {
             revert CrossChainSetupHasBeenInitialised();
@@ -41,7 +39,6 @@ contract CrossChainSetup is Ownable {
         setupData.destinationChain = _destinationChain;
         setupData.registryL1 = _registryL1;
         setupData.registryL2 = _registryL2;
-        setupData.tokenReward = _tokenReward;
     }
 
     function getSetupData() external view returns (SetupData memory) {

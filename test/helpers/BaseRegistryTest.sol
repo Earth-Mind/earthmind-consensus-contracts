@@ -6,7 +6,6 @@ import {BaseTest} from "./BaseTest.sol";
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
-import {EarthMindTokenReward} from "@contracts/EarthMindTokenReward.sol";
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 
@@ -29,7 +28,6 @@ contract BaseRegistryTest is BaseTest {
     EarthMindRegistryL1 internal earthMindRegistryL1;
     EarthMindRegistryL2 internal earthMindRegistryL2;
     CrossChainSetup internal crosschainSetup;
-    EarthMindTokenReward internal earthMindTokenInstance;
 
     address internal DEPLOYER = vm.addr(1234);
     address internal EARTHMIND_CONSENSUS_ADDRESS = address(0); // @dev Since the registry doesn't require the consensus but the Account contract does it, we simply pass address(0)
@@ -61,29 +59,11 @@ contract BaseRegistryTest is BaseTest {
 
         address consensusAddress = _getConsensusAddress();
 
-        miner1.init(
-            earthMindRegistryL1,
-            earthMindRegistryL2,
-            earthMindTokenInstance,
-            EarthMindConsensus(consensusAddress),
-            DEPLOYER
-        );
+        miner1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
 
-        validator1.init(
-            earthMindRegistryL1,
-            earthMindRegistryL2,
-            earthMindTokenInstance,
-            EarthMindConsensus(consensusAddress),
-            DEPLOYER
-        );
+        validator1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
 
-        protocol1.init(
-            earthMindRegistryL1,
-            earthMindRegistryL2,
-            earthMindTokenInstance,
-            EarthMindConsensus(consensusAddress),
-            DEPLOYER
-        );
+        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
     }
 
     function _getConsensusAddress() internal view virtual returns (address) {
@@ -95,7 +75,6 @@ contract BaseRegistryTest is BaseTest {
 
         // we deploy a deployer contract to deploy the registry contracts
         create2Deployer = new Create2Deployer();
-        earthMindTokenInstance = new EarthMindTokenReward(DEPLOYER);
         crosschainSetup = new CrossChainSetup(DEPLOYER);
 
         // setup mock providers

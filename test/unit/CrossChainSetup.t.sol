@@ -66,10 +66,9 @@ contract CrossChainSetupTest is Test {
         address registryL2 = vm.addr(3456);
         string memory sourceChain = "sourceChain";
         string memory destinationChain = "destinationChain";
-        address tokenRewards = vm.addr(4567);
 
         vm.expectRevert("Ownable: caller is not the owner");
 
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2, tokenRewards);
+        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
     }
 }

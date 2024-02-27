@@ -25,15 +25,9 @@ deploy_registry LAYER NETWORK_ID JSON_RPC_URL:
 deploy_registry_l2 NETWORK_ID JSON_RPC_URL:
     forge script script/004_Deploy_Registry_L2.s.sol:DeployRegistryL2Script --rpc-url $CHAIN2_URL --chain-id $CHAIN2_ID --sender $SENDER --broadcast --ffi -vvvv
 
-deploy_rewards_token NETWORK_ID JSON_RPC_URL:
-    forge script script/005_Deploy_EarthMindRewardsToken.s.sol:DeployRewardsTokenScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
-
 deploy_consensus NETWORK_ID JSON_RPC_URL:
-    forge script script/006_Deploy_Consensus.s.sol:DeployConsensusScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
-
-transfer_ownership NETWORK_ID JSON_RPC_URL:
-    forge script script/007_Transfer_TokenReward_Ownership.sol:TransferOwnershipScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
-
+    forge script script/005_Deploy_Consensus.s.sol:DeployConsensusScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
+    
 deploy_local_contracts:
     echo "Deploying contracts locally"
     just deploy_create2_deployer $CHAIN1_ID $CHAIN1_URL # L1
@@ -44,9 +38,7 @@ deploy_local_contracts:
     just deploy_crosschain_setup $CHAIN2_ID $CHAIN2_URL # L2
     just deploy_registry $L1 $CHAIN1_ID $CHAIN1_URL # L1
     just deploy_registry $L2 $CHAIN2_ID $CHAIN2_URL # L2
-    just deploy_rewards_token $CHAIN2_ID $CHAIN2_URL # L1
     just deploy_consensus $CHAIN2_ID $CHAIN2_URL # L2
-    just transfer_ownership $CHAIN2_ID $CHAIN2_URL # L2
 
 # orchestration and testing
 test_unit:

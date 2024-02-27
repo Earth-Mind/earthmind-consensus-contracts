@@ -8,7 +8,6 @@ import {IAxelarGasService} from "@axelar/interfaces/IAxelarGasService.sol";
 import {EarthMindRegistryL2} from "./EarthMindRegistryL2.sol";
 import {TimeBasedEpochs} from "./TimeBasedEpochs.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
-import {EarthMindTokenReward} from "./EarthMindTokenReward.sol";
 
 import {
     InvalidValidator,
@@ -31,7 +30,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     IAxelarGasService public immutable gasReceiver;
 
     EarthMindRegistryL2 public registry;
-    EarthMindTokenReward public tokenRewards;
 
     struct MinerProposal {
         bytes32 proposalHash;
@@ -55,6 +53,9 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     mapping(uint256 epoch => mapping(address => TopMinersProposal)) public validatorProposals;
     // mapping(uint256 epoch => )
 
+    // TODO Give rewards when win during epoch
+    mapping(address miner => uint256 rewardsBalance) public rewardsBalance;
+
     event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
     event ProposalRevealed(uint256 indexed epoch, address indexed miner, bool vote, string message);
     event TopMinersProposalCommitted(uint256 indexed epoch, address indexed validator, bytes32 scoreHash);
@@ -63,12 +64,10 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     // L1 Governance Requests
     event RequestReceived(uint256 indexed epoch, address indexed sender, bytes32 message);
 
-    constructor(CrossChainSetup _setup, address _gateway, address _gasService) AxelarExecutable(_gateway) {
+    constructor(address _registryL2, address _gateway, address _gasService) AxelarExecutable(_gateway) {
         gasReceiver = IAxelarGasService(_gasService);
 
-        registry = EarthMindRegistryL2(_setup.getSetupData().registryL2);
-
-        tokenRewards = EarthMindTokenReward(_setup.getSetupData().tokenReward);
+        registry = EarthMindRegistryL2(_registryL2);
     }
 
     // Miner Operations
