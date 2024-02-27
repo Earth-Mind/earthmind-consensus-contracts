@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "./Account.sol";
+import {BaseAccount} from "./BaseAccount.sol";
 
-contract Miner is Account {
+contract Miner is BaseAccount {
     bytes32 internal DEFAULT_PROPOSAL_ID = keccak256("proposal_id");
 
     struct ProposalInfo {
@@ -20,33 +20,58 @@ contract Miner is Account {
     uint256 private constant DEFAULT_EPOCH = 1;
     uint256 private epoch;
 
-    constructor(string memory _name, Vm _vm) Account(_name, _vm) {
+    constructor(BaseAccount.AccountParams memory _params) BaseAccount(_params) {
         proposal = defaultProposal;
         epoch = DEFAULT_EPOCH;
     }
 
     function registerMiner() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
+
+        if (forkMode) {
+            vm.selectFork(networkL1);
+        }
+
         earthMindRegistryL1Instance.registerMiner{value: msg.value}();
+
         _refreshBalances();
     }
 
     function unRegisterMiner() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
+
+        if (forkMode) {
+            vm.selectFork(networkL2);
+        }
+
         earthMindRegistryL2Instance.unRegisterMiner{value: msg.value}();
+
         _refreshBalances();
     }
 
     function commitProposal() external {
         bytes32 proposalHash = calculateProposalHash(proposal);
-        vm.prank(addr);
+
+        vm.startPrank(addr);
+
+        if (forkMode) {
+            vm.selectFork(networkL2);
+        }
+
         earthMindConsensusInstance.commitProposal(epoch, proposalHash);
+
         _refreshBalances();
     }
 
     function revealProposal() external {
-        vm.prank(addr);
+        vm.startPrank(addr);
+
+        if (forkMode) {
+            vm.selectFork(networkL2);
+        }
+
         earthMindConsensusInstance.revealProposal(epoch, proposal.vote, proposal.message);
+
         _refreshBalances();
     }
 

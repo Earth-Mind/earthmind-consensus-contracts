@@ -12,6 +12,7 @@ import {Constants} from "@constants/Constants.sol";
 
 import {BaseTest} from "./BaseTest.sol";
 
+import {BaseAccount} from "./BaseAccount.sol";
 import {Validator} from "./Validator.sol";
 import {Protocol} from "./Protocol.sol";
 import {Miner} from "./Miner.sol";
@@ -21,8 +22,7 @@ import {Vm} from "forge-std/Vm.sol";
 contract BaseIntegrationTest is BaseTest {
     using DeploymentUtils for Vm;
 
-    address internal DEPLOYER;
-
+    // Instances
     MockGateway internal mockGatewayL1;
     MockGateway internal mockGatewayL2;
 
@@ -31,19 +31,21 @@ contract BaseIntegrationTest is BaseTest {
     EarthMindConsensus internal earthMindConsensus;
 
     // Accounts
-    Validator internal validator1;
-    Protocol internal protocol1;
-    Miner internal miner1;
+    Validator[] internal validators;
+    Protocol[] internal protocols;
+    Miner[] internal miners;
 
     Configuration.ConfigValues internal configL1;
     Configuration.ConfigValues internal configL2;
 
+    // Forking
     string public constant NETWORK_L1 = "31337";
     string public constant NETWORK_L2 = "31338";
 
     uint256 networkL1;
     uint256 networkL2;
 
+    // Addresses
     address gatewayAddressL1;
     address gatewayAddressL2;
 
@@ -72,14 +74,41 @@ contract BaseIntegrationTest is BaseTest {
     }
 
     function _setupAccounts() internal virtual {
-        validator1 = new Validator("validator_1", vm);
-        miner1 = new Miner("miner_1", vm);
-        protocol1 = new Protocol("protocol_1", vm);
+        Validator validator1 = new Validator(BaseAccount.AccountParams({
+            name: "validator_1",
+            vm: vm,
+            forkMode: true,
+            l1Network: networkL1,
+            l2Network: networkL2,
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: earthMindConsensus
+        }));
 
-        miner1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
+        Miner miner1 = new Miner(BaseAccount.AccountParams({
+            name: "miner_1",
+            vm: vm,
+            forkMode: true,
+            l1Network: networkL1,
+            l2Network: networkL2,
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: earthMindConsensus
+        }));
 
-        validator1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
+        Protocol protocol1 = new Protocol(BaseAccount.AccountParams({
+            name: "protocol_1",
+            vm: vm,
+            forkMode: true,
+            l1Network: networkL1,
+            l2Network: networkL2,
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: earthMindConsensus
+        }));
 
-        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, earthMindConsensus);
+        validators.push(validator1);
+        miners.push(miner1);
+        protocols.push(protocol1);
     }
 }

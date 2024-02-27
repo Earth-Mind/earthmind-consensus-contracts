@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "./Account.sol";
+import {BaseAccount} from "./BaseAccount.sol";
 
-contract Validator is Account {
+contract Validator is BaseAccount {
     bytes32 internal DEFAULT_PROPOSAL_ID = keccak256("proposal_id");
 
     struct ProposalInfo {
@@ -19,7 +19,7 @@ contract Validator is Account {
     uint256 private constant DEFAULT_EPOCH = 1;
     uint256 private epoch;
 
-    constructor(string memory _name, Vm _vm) Account(_name, _vm) {
+    constructor(BaseAccount.AccountParams memory _params) BaseAccount(_params) {
         proposal = defaultProposal;
         epoch = DEFAULT_EPOCH;
     }

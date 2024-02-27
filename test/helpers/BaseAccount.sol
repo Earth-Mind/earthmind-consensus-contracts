@@ -5,10 +5,9 @@ import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 
-import "forge-std/Vm.sol";
-import "forge-std/console.sol";
+import {Vm} from "forge-std/Vm.sol";
 
-contract Account {
+contract BaseAccount {
     address public immutable addr;
 
     EarthMindRegistryL1 internal earthMindRegistryL1Instance;
@@ -22,35 +21,38 @@ contract Account {
     uint256 public currentETHBalance;
 
     Vm internal vm;
-    bool internal initialized;
 
-    constructor(string memory _name, Vm _vm) {
-        vm = _vm;
-        addr = _createAccount(_name);
-        initialized = false;
+    bool internal forkMode;
+    uint256 internal networkL1;
+    uint256 internal networkL2;
+
+    struct AccountParams {
+        string name;
+        Vm vm;
+        bool forkMode;
+        uint256 l1Network;
+        uint256 l2Network;
+        EarthMindRegistryL1 earthMindRegistryL1Instance;
+        EarthMindRegistryL2 earthMindRegistryL2Instance;
+        EarthMindConsensus earthMindConsensusInstance;
     }
 
-    function init(
-        EarthMindRegistryL1 _earthMindRegistryL1Instance,
-        EarthMindRegistryL2 _earthMindRegistryL2Instance,
-        EarthMindConsensus _earthMindConsensusInstance
-    ) public {
-        require(!initialized, "Account already initialized");
-        initialized = true;
-        console.log("Initializing Account");
+    constructor(AccountParams memory _params) {
+        vm = _params.vm;
+        addr = _createAccount(_params.name);
+
+        forkMode = _params.forkMode;
+        networkL1 = _params.l1Network;
+        networkL2 = _params.l2Network;
+
         // Set instances
-        earthMindRegistryL1Instance = _earthMindRegistryL1Instance;
-        earthMindRegistryL2Instance = _earthMindRegistryL2Instance;
-        earthMindConsensusInstance = _earthMindConsensusInstance;
+        earthMindRegistryL1Instance = _params.earthMindRegistryL1Instance;
+        earthMindRegistryL2Instance = _params.earthMindRegistryL2Instance;
+        earthMindConsensusInstance = _params.earthMindConsensusInstance;
 
         // Set initial balances
         initialETHBalance = address(addr).balance;
-
-        if (address(earthMindConsensusInstance) != address(0)) {
-            initialRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
-        }
-
-        console.log("Account initialized");
+        initialRewardsBalance = 0;
     }
 
     function refreshBalances() public {
@@ -58,6 +60,10 @@ contract Account {
     }
 
     function _refreshBalances() internal {
+        if (forkMode) {
+            vm.selectFork(networkL2);
+        }
+
         currentETHBalance = address(addr).balance;
 
         if (address(earthMindConsensusInstance) != address(0)) {

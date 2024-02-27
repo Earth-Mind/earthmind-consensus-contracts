@@ -13,17 +13,22 @@ import {MockProvider} from "@contracts/mocks/MockProvider.sol";
 
 import {Configuration} from "@config/Configuration.sol";
 
+import {BaseAccount} from "./BaseAccount.sol";
 import {Validator} from "./Validator.sol";
 import {Protocol} from "./Protocol.sol";
 import {Miner} from "./Miner.sol";
 
-import "forge-std/console.sol";
+import {console} from "forge-std/console.sol";
 
 // @dev This contract is used to test the registry contracts
 // By default we define 3 accounts per each ecosystem participant
 // However, the accounts can be overwritten by the test contract that inherits from this contract.
 // It also includes virtual functions that can be overwritten by the test contract.
 contract BaseRegistryTest is BaseTest {
+    // Instances
+    MockProvider internal axelarGatewayMock;
+    MockProvider internal axelarGasServiceMock;
+
     Create2Deployer internal create2Deployer;
     EarthMindRegistryL1 internal earthMindRegistryL1;
     EarthMindRegistryL2 internal earthMindRegistryL2;
@@ -37,9 +42,6 @@ contract BaseRegistryTest is BaseTest {
     Protocol internal protocol1;
     Miner internal miner1;
 
-    // Mock
-    MockProvider internal axelarGatewayMock;
-    MockProvider internal axelarGasServiceMock;
     Configuration.ConfigValues internal config;
 
     function _setUp() internal virtual {
@@ -50,24 +52,6 @@ contract BaseRegistryTest is BaseTest {
         _deploy();
 
         _setupAccounts();
-    }
-
-    function _setupAccounts() internal virtual {
-        validator1 = new Validator("validator_1", vm);
-        miner1 = new Miner("miner_1", vm);
-        protocol1 = new Protocol("protocol_1", vm);
-
-        address consensusAddress = _getConsensusAddress();
-
-        miner1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
-
-        validator1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
-
-        protocol1.init(earthMindRegistryL1, earthMindRegistryL2, EarthMindConsensus(consensusAddress));
-    }
-
-    function _getConsensusAddress() internal view virtual returns (address) {
-        return EARTHMIND_CONSENSUS_ADDRESS;
     }
 
     function _deploy() internal virtual {
@@ -113,5 +97,46 @@ contract BaseRegistryTest is BaseTest {
 
         console.log("BaseRegistry Deploy Done");
         vm.stopPrank();
+    }
+
+    function _setupAccounts() internal virtual {
+        address consensusAddress = _getConsensusAddress();
+
+        validator1 = new Validator(BaseAccount.AccountParams({
+            name: "validator_1",
+            vm: vm,
+            forkMode: false,
+            l1Network: 0, // since no fork mode
+            l2Network: 0, // since no fork mode
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+        }));
+
+        miner1 = new Miner(BaseAccount.AccountParams({
+            name: "miner_1",
+            vm: vm,
+            forkMode: false,
+            l1Network: 0, // since no fork mode
+            l2Network: 0, // since no fork mode
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+        }));
+
+        protocol1 = new Protocol(BaseAccount.AccountParams({
+            name: "protocol_1",
+            vm: vm,
+            forkMode: false,
+            l1Network: 0, // since no fork mode
+            l2Network: 0, // since no fork mode
+            earthMindRegistryL1Instance: earthMindRegistryL1,
+            earthMindRegistryL2Instance: earthMindRegistryL2,
+            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+        }));
+    }
+
+    function _getConsensusAddress() internal view virtual returns (address) {
+        return EARTHMIND_CONSENSUS_ADDRESS;
     }
 }
