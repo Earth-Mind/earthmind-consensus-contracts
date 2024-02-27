@@ -111,6 +111,7 @@ contract BaseRegistryTest is BaseTest {
         earthMindRegistryL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
         earthMindRegistryL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
 
+        console.log("BaseRegistry Deploy Done");
         vm.stopPrank();
     }
 }

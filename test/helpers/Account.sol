@@ -6,6 +6,7 @@ import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 
 import "forge-std/Vm.sol";
+import "forge-std/console.sol";
 
 contract Account {
     address public immutable addr;
@@ -36,7 +37,7 @@ contract Account {
     ) public {
         require(!initialized, "Account already initialized");
         initialized = true;
-
+        console.log("Initializing Account");
         // Set instances
         earthMindRegistryL1Instance = _earthMindRegistryL1Instance;
         earthMindRegistryL2Instance = _earthMindRegistryL2Instance;
@@ -44,7 +45,12 @@ contract Account {
 
         // Set initial balances
         initialETHBalance = address(addr).balance;
-        initialRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
+
+        if (address(earthMindConsensusInstance) != address(0)) {
+            initialRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
+        }
+
+        console.log("Account initialized");
     }
 
     function refreshBalances() public {
@@ -52,8 +58,11 @@ contract Account {
     }
 
     function _refreshBalances() internal {
-        currentRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
         currentETHBalance = address(addr).balance;
+
+        if (address(earthMindConsensusInstance) != address(0)) {
+            currentRewardsBalance = earthMindConsensusInstance.rewardsBalance(addr);
+        }
     }
 
     function _createAccount(string memory _name) internal returns (address) {

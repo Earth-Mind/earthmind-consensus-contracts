@@ -43,7 +43,7 @@ deploy_local_contracts:
 # orchestration and testing
 test_unit:
     echo "Running unit tests"
-    forge test -vvvv
+    forge test --match-path "*/unit/*.sol" -vvvv
 
 test_coverage:
     forge coverage --report lcov
@@ -54,3 +54,6 @@ test_integration:
     echo "Running integration tests"
     # just deploy_local_contracts
     forge test --match-path "*/integration/*.sol" -vvvv
+
+test CONTRACT:
+    forge test --mc {{CONTRACT}} -vvvv
