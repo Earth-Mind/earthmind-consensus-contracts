@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
+import {BaseIntegrationTest} from "../helpers/BaseIntegrationTest.sol";
 
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 
-contract ValidatorRegistrationIntegrationTest is BaseRegistryTest {
+contract ValidatorRegistrationIntegrationTest is BaseIntegrationTest {
     MockGateway internal mockGateway;
 
     function setUp() public {
@@ -18,10 +18,3 @@ contract ValidatorRegistrationIntegrationTest is BaseRegistryTest {
         assertEq(true, true);
     }
 }
-
-// corro cross-anvil
-// obtengo las direcciones
-// creo instancias
-// hago llamadas
-// bridgeo
-// aserto

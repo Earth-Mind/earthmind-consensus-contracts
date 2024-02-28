@@ -24,7 +24,9 @@ contract BaseScript is Script {
 
     constructor() {
         string memory networkId = vm.envString("NETWORK_ID");
+
         config = vm.getConfiguration(networkId);
+
         deployer = vm.loadDeployerAddress();
 
         // setup paths
