@@ -18,13 +18,16 @@ import {Validator} from "./Validator.sol";
 import {Protocol} from "./Protocol.sol";
 import {Miner} from "./Miner.sol";
 
-import {console} from "forge-std/console.sol";
+import {console2} from "forge-std/console2.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 // @dev This contract is used to test the registry contracts
 // By default we define 3 accounts per each ecosystem participant
 // However, the accounts can be overwritten by the test contract that inherits from this contract.
 // It also includes virtual functions that can be overwritten by the test contract.
 contract BaseRegistryTest is BaseTest {
+    using Configuration for Vm;
+
     // Instances
     MockProvider internal axelarGatewayMock;
     MockProvider internal axelarGasServiceMock;
@@ -47,7 +50,7 @@ contract BaseRegistryTest is BaseTest {
     function _setUp() internal virtual {
         string memory networkId = vm.envString("NETWORK_ID");
 
-        config = Configuration.getConfiguration(networkId);
+        config = vm.getConfiguration(networkId);
 
         _deploy();
 
@@ -72,7 +75,7 @@ contract BaseRegistryTest is BaseTest {
         );
 
         address registryL1ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL1));
-        console.log("The RegistryL1 address: %s", registryL1ComputedAddress);
+        console2.log("The RegistryL1 address: %s", registryL1ComputedAddress);
 
         // calculate the address of the RegistryL2 contract
         bytes memory creationCodeL2 = abi.encodePacked(
@@ -81,7 +84,7 @@ contract BaseRegistryTest is BaseTest {
         );
 
         address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
-        console.log("The RegistryL2 address: %s", registryL2ComputedAddress);
+        console2.log("The RegistryL2 address: %s", registryL2ComputedAddress);
 
         // setup the crosschain setup contract with the addresses of the registry contracts
         crosschainSetup.setup(
@@ -95,7 +98,7 @@ contract BaseRegistryTest is BaseTest {
         earthMindRegistryL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
         earthMindRegistryL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);
 
-        console.log("BaseRegistry Deploy Done");
+        console2.log("BaseRegistry Deploy Done");
         vm.stopPrank();
     }
 

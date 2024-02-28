@@ -3,6 +3,7 @@ pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {MockGasReceiver} from "@contracts/mocks/MockGasReceiver.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 import {Constants} from "@constants/Constants.sol";
 
@@ -38,5 +39,21 @@ contract DeployAxelarMockScript is BaseScript {
         assert(deployedAddressOfMockGateway == mockGatewayComputedAddress);
 
         vm.saveDeploymentAddress(Constants.MOCK_GATEWAY, deployedAddressOfMockGateway);
+
+        // calculate the address of mock gas service
+        bytes memory mockGasServiceCreationCode = abi.encodePacked(type(MockGasReceiver).creationCode);
+
+        address mockGasServiceComputedAddress =
+            create2Deployer.computeAddress(config.salt, keccak256(mockGasServiceCreationCode));
+
+        console2.log("Computed address of MockGasReceiver");
+        console2.logAddress(mockGasServiceComputedAddress);
+
+        // deploy the mock gas service contract
+        address deployedAddressOfMockGasService = create2Deployer.deploy(0, config.salt, mockGasServiceCreationCode);
+
+        assert(deployedAddressOfMockGasService == mockGasServiceComputedAddress);
+
+        vm.saveDeploymentAddress(Constants.MOCK_GAS_RECEIVER, deployedAddressOfMockGasService);
     }
 }

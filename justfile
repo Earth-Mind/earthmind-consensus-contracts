@@ -43,7 +43,7 @@ deploy_local_contracts:
 # orchestration and testing
 test_unit:
     echo "Running unit tests"
-    forge test --match-path "*/unit/*.sol" -vvvv
+    NETWORK_ID=3137 forge test --match-path "*/unit/*.sol" -vvvv
 
 test_coverage:
     forge coverage --report lcov
@@ -52,7 +52,7 @@ test_coverage:
 
 test_integration:
     echo "Running integration tests"
-    # just deploy_local_contracts
+    just deploy_local_contracts
     forge test --match-path "*/integration/*.sol" -vvvv
 
 test CONTRACT:

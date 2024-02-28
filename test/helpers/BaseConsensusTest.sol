@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {BaseRegistryTest} from "./BaseRegistryTest.sol";
-
 import {Strings} from "@openzeppelin/utils/Strings.sol";
 
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
-
 import {Configuration} from "@config/Configuration.sol";
+
+import {BaseRegistryTest} from "./BaseRegistryTest.sol";
+
+import {Vm} from "forge-std/Vm.sol";
 
 // @dev This contract is used to test the consensus contract
 // It inherits from BaseRegistryTest to have access to the whole BaseRegistry setup.
 contract BaseConsensusTest is BaseRegistryTest {
+    using Configuration for Vm;
+
     EarthMindConsensus internal earthMindConsensusInstance;
 
     event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
@@ -24,7 +27,7 @@ contract BaseConsensusTest is BaseRegistryTest {
         // @dev load the network id from the environment and get the configuration
         string memory networkId = vm.envString("NETWORK_ID");
 
-        config = Configuration.getConfiguration(networkId);
+        config = vm.getConfiguration(networkId);
 
         _deploy();
 

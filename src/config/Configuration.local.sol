@@ -2,28 +2,38 @@
 pragma solidity 0.8.19;
 
 import {Constants} from "@constants/Constants.sol";
+import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
+
 import {Configuration} from "./Configuration.sol";
 
+import {Vm} from "forge-std/Vm.sol";
+
 library ConfigurationL1Local {
+    using DeploymentUtils for Vm;
+
     bytes32 private constant SALT = hex"65617274686D696E64"; // earthmind
     string private constant SOURCE_CHAIN = Constants.LOCAL_L1_NETWORK;
     string private constant DESTINATION_CHAIN = Constants.LOCAL_L2_NETWORK;
-    address private constant AXELAR_GATEWAY = 0xe432150cce91c13a887f7D836923d5597adD8E31;
-    address private constant AXELAR_GAS_SERVICE = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6;
 
-    function getConfig() external pure returns (Configuration.ConfigValues memory) {
+    function getConfig(Vm vm) external view returns (Configuration.ConfigValues memory) {
+        address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
+        address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
+
         return Configuration.ConfigValues(SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }
 
 library ConfigurationL2Local {
+    using DeploymentUtils for Vm;
+
     bytes32 private constant SALT = hex"65617274686D696E64"; // earthmind
     string private constant SOURCE_CHAIN = Constants.LOCAL_L2_NETWORK;
     string private constant DESTINATION_CHAIN = Constants.LOCAL_L1_NETWORK;
-    address private constant AXELAR_GATEWAY = 0xe432150cce91c13a887f7D836923d5597adD8E31;
-    address private constant AXELAR_GAS_SERVICE = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6;
 
-    function getConfig() external pure returns (Configuration.ConfigValues memory) {
+    function getConfig(Vm vm) external view returns (Configuration.ConfigValues memory) {
+        address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
+        address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
+
         return Configuration.ConfigValues(SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }

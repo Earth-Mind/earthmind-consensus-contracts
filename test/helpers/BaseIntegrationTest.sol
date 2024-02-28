@@ -35,15 +35,9 @@ contract BaseIntegrationTest is BaseTest {
     Protocol[] internal protocols;
     Miner[] internal miners;
 
-    Configuration.ConfigValues internal configL1;
-    Configuration.ConfigValues internal configL2;
-
     // Forking
-    string public constant NETWORK_L1 = "31337";
-    string public constant NETWORK_L2 = "31338";
-
-    uint256 networkL1;
-    uint256 networkL2;
+    uint256 internal networkL1;
+    uint256 internal networkL2;
 
     // Addresses
     address gatewayAddressL1;
@@ -59,13 +53,13 @@ contract BaseIntegrationTest is BaseTest {
         networkL2 = vm.createFork("http://localhost:8556");
 
         // load deployment addresses
-        gatewayAddressL1 = vm.loadDeploymentAddress(NETWORK_L1, Constants.MOCK_GATEWAY);
-        gatewayAddressL2 = vm.loadDeploymentAddress(NETWORK_L2, Constants.MOCK_GATEWAY);
+        gatewayAddressL1 = vm.loadDeploymentAddress(Constants.LOCAL_L1_NETWORK, Constants.MOCK_GATEWAY);
+        gatewayAddressL2 = vm.loadDeploymentAddress(Constants.LOCAL_L2_NETWORK, Constants.MOCK_GATEWAY);
 
-        registryAddressL1 = vm.loadDeploymentAddress(NETWORK_L1, Constants.EARTHMIND_REGISTRY_L1);
-        registryAddressL2 = vm.loadDeploymentAddress(NETWORK_L2, Constants.EARTHMIND_REGISTRY_L2);
+        registryAddressL1 = vm.loadDeploymentAddress(Constants.LOCAL_L1_NETWORK, Constants.EARTHMIND_REGISTRY_L1);
+        registryAddressL2 = vm.loadDeploymentAddress(Constants.LOCAL_L2_NETWORK, Constants.EARTHMIND_REGISTRY_L2);
 
-        consensusAddress = vm.loadDeploymentAddress(NETWORK_L2, Constants.EARTHMIND_CONSENSUS);
+        consensusAddress = vm.loadDeploymentAddress(Constants.LOCAL_L2_NETWORK, Constants.EARTHMIND_CONSENSUS);
 
         // setup instances
         earthMindRegistryL1 = EarthMindRegistryL1(registryAddressL1);
