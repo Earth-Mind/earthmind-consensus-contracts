@@ -3,6 +3,8 @@ pragma solidity 0.8.19;
 
 import {BaseAccount} from "./BaseAccount.sol";
 
+import {console2} from "forge-std/console2.sol";
+
 contract Miner is BaseAccount {
     bytes32 internal DEFAULT_PROPOSAL_ID = keccak256("proposal_id");
 
@@ -26,15 +28,15 @@ contract Miner is BaseAccount {
     }
 
     function registerMiner() external payable {
-        vm.startPrank(addr);
-
         if (forkMode) {
             vm.selectFork(networkL1);
         }
 
+        vm.startPrank(addr);
+
         earthMindRegistryL1Instance.registerMiner{value: msg.value}();
 
-        _refreshBalances();
+        // _refreshBalances();
     }
 
     function unRegisterMiner() external payable {
