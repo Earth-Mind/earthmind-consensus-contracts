@@ -3,11 +3,11 @@ pragma solidity 0.8.19;
 
 import {IAxelarGasService} from "@axelar/interfaces/IAxelarGasService.sol";
 import {IAxelarGateway} from "@axelar/interfaces/IAxelarGateway.sol";
-import {Strings} from "@openzeppelin/utils/Strings.sol";
 
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
+import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
 import {Configuration} from "@config/Configuration.sol";
 
@@ -18,6 +18,8 @@ import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
 import "forge-std/console2.sol";
 
 contract EarthMindRegistryL2Test is BaseRegistryTest {
+    using AddressUtils for address;
+
     event MinerUnregistered(address indexed Miner);
     event ValidatorUnregistered(address indexed Validator);
 
@@ -111,35 +113,27 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_unRegisterProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function _registerProtocolViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", protocol1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function _registerMinerViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", miner1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function _registerValidatorViaMessage() internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", validator1.addr());
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 }

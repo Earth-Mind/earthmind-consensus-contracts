@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Strings} from "@openzeppelin/utils/Strings.sol";
 import {AxelarExecutable} from "@axelar/executable/AxelarExecutable.sol";
 import {IAxelarGasService} from "@axelar/interfaces/IAxelarGasService.sol";
 

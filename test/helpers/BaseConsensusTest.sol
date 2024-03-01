@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Strings} from "@openzeppelin/utils/Strings.sol";
-
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 import {Configuration} from "@config/Configuration.sol";
+import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
 import {BaseRegistryTest} from "./BaseRegistryTest.sol";
 
@@ -14,6 +13,7 @@ import {Vm} from "forge-std/Vm.sol";
 // It inherits from BaseRegistryTest to have access to the whole BaseRegistry setup.
 contract BaseConsensusTest is BaseRegistryTest {
     using Configuration for Vm;
+    using AddressUtils for address;
 
     EarthMindConsensus internal earthMindConsensusInstance;
 
@@ -45,26 +45,20 @@ contract BaseConsensusTest is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", _protocolAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function _registerMinerViaMessage(address _minerAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", _minerAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function _registerValidatorViaMessage(address _validatorAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", _validatorAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(
-            commandId, config.sourceChain, Strings.toHexString(address(earthMindRegistryL1)), payload
-        );
+        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 }

@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Strings} from "@openzeppelin/utils/Strings.sol";
 import {IAxelarGasService} from "@axelar/interfaces/IAxelarGasService.sol";
 import {IAxelarGateway} from "@axelar/interfaces/IAxelarGateway.sol";
 
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 import {TimeBasedEpochs} from "@contracts/TimeBasedEpochs.sol";
 import {Configuration} from "@config/Configuration.sol";
+import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
 import {BaseConsensusTest} from "../helpers/BaseConsensusTest.sol";
 
 contract EarthMindConsensusTest is BaseConsensusTest {
+    using AddressUtils for address;
+
     bytes32 internal PROPOSAL_ID = keccak256("proposal_id");
 
     uint256 internal MINER_COMMIT_PERIOD = 5 minutes;
@@ -238,8 +240,6 @@ contract EarthMindConsensusTest is BaseConsensusTest {
 
         vm.prank(protocol1.addr());
 
-        earthMindConsensusInstance.execute(
-            commandId, config.sourceChain, Strings.toHexString(protocol1.addr()), payload
-        );
+        earthMindConsensusInstance.execute(commandId, config.sourceChain, protocol1.addr().toString(), payload);
     }
 }
