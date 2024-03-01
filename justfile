@@ -43,16 +43,16 @@ deploy_local_contracts:
 # orchestration and testing
 test_unit:
     echo "Running unit tests"
-    NETWORK_ID=3137 forge test --match-path "*/unit/*.sol" -vvvv
+    NETWORK_ID=3137 forge test --match-path "test/unit/**/*.sol"
 
 test_coverage:
-    forge coverage --report lcov
-    lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script'
+    forge coverage --report lcov 
+    lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script' 'DeployerUtils.sol' 'DeploymentUtils.sol'
     genhtml lcov.info -o coverage --branch-coverage --ignore-errors category
 
-test_integration:
+test_integration skip:
     echo "Running integration tests"
-    just deploy_local_contracts
+    {{ if skip == "skip-deploy" { "echo Skipping deployment" } else { "just deploy_local_contracts" } }}
     forge test --match-path "*/integration/*.sol" -vvvv
 
 test CONTRACT:
