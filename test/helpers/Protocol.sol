@@ -8,7 +8,7 @@ contract Protocol is BaseAccount {
     constructor(BaseAccount.AccountParams memory _params) BaseAccount(_params) {}
 
     function registerProtocol() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
 
         earthMindRegistryL1Instance.registerProtocol{value: msg.value}();
 
@@ -16,7 +16,7 @@ contract Protocol is BaseAccount {
     }
 
     function unRegisterProtocol() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
 
         earthMindRegistryL1Instance.unRegisterProtocol{value: msg.value}();
 
@@ -24,7 +24,7 @@ contract Protocol is BaseAccount {
     }
 
     function requestGovernanceDecision() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
 
         // TODO: Implement requesting a governance decision
 

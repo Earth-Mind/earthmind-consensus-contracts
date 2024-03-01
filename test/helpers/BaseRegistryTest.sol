@@ -105,38 +105,44 @@ contract BaseRegistryTest is BaseTest {
     function _setupAccounts() internal virtual {
         address consensusAddress = _getConsensusAddress();
 
-        validator1 = new Validator(BaseAccount.AccountParams({
-            name: "validator_1",
-            vm: vm,
-            forkMode: false,
-            l1Network: 0, // since no fork mode
-            l2Network: 0, // since no fork mode
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
-        }));
+        validator1 = new Validator(
+            BaseAccount.AccountParams({
+                name: "validator_1",
+                vm: vm,
+                forkMode: false,
+                l1Network: 0, // since no fork mode
+                l2Network: 0, // since no fork mode
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+            })
+        );
 
-        miner1 = new Miner(BaseAccount.AccountParams({
-            name: "miner_1",
-            vm: vm,
-            forkMode: false,
-            l1Network: 0, // since no fork mode
-            l2Network: 0, // since no fork mode
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
-        }));
+        miner1 = new Miner(
+            BaseAccount.AccountParams({
+                name: "miner_1",
+                vm: vm,
+                forkMode: false,
+                l1Network: 0, // since no fork mode
+                l2Network: 0, // since no fork mode
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+            })
+        );
 
-        protocol1 = new Protocol(BaseAccount.AccountParams({
-            name: "protocol_1",
-            vm: vm,
-            forkMode: false,
-            l1Network: 0, // since no fork mode
-            l2Network: 0, // since no fork mode
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
-        }));
+        protocol1 = new Protocol(
+            BaseAccount.AccountParams({
+                name: "protocol_1",
+                vm: vm,
+                forkMode: false,
+                l1Network: 0, // since no fork mode
+                l2Network: 0, // since no fork mode
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: EarthMindConsensus(consensusAddress)
+            })
+        );
     }
 
     function _getConsensusAddress() internal view virtual returns (address) {

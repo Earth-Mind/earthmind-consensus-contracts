@@ -31,8 +31,9 @@ contract BaseConsensusTest is BaseRegistryTest {
 
         _deploy();
 
-        earthMindConsensusInstance =
-        new EarthMindConsensus(address(earthMindRegistryL2), address(axelarGatewayMock), address(axelarGasServiceMock));
+        earthMindConsensusInstance = new EarthMindConsensus(
+            address(earthMindRegistryL2), address(axelarGatewayMock), address(axelarGasServiceMock)
+        );
 
         _setupAccounts();
     }
@@ -45,20 +46,28 @@ contract BaseConsensusTest is BaseRegistryTest {
         bytes memory payload = abi.encodeWithSignature("_registerProtocol(address)", _protocolAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
+        _sendMessage(commandId, payload);
     }
 
     function _registerMinerViaMessage(address _minerAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerMiner(address)", _minerAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
+        _sendMessage(commandId, payload);
     }
 
     function _registerValidatorViaMessage(address _validatorAddress) internal {
         bytes memory payload = abi.encodeWithSignature("_registerValidator(address)", _validatorAddress);
         bytes32 commandId = keccak256(payload);
 
-        earthMindRegistryL2.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
+        _sendMessage(commandId, payload);
+    }
+
+    function _sendMessage(bytes32 _commandId, bytes memory _payload) internal {
+        // @dev Be aware that the source chain is the L2 chain in reality but since we are using just 1 chain for unit testing we use the
+        // destination chain as the source chain (in this case the L2 becomes the source chain)
+        earthMindRegistryL2.execute(
+            _commandId, config.destinationChain, address(earthMindRegistryL1).toString(), _payload
+        );
     }
 }

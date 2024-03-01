@@ -25,27 +25,27 @@ contract Validator is BaseAccount {
     }
 
     function registerValidator() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
         earthMindRegistryL1Instance.registerValidator{value: msg.value}();
         _refreshBalances();
     }
 
     function unRegisterValidator() external payable {
-        vm.prank(addr);
+        vm.startPrank(addr);
         earthMindRegistryL2Instance.unRegisterValidator{value: msg.value}();
         _refreshBalances();
     }
 
     // fix params sent to commitScores
     function commitScores() external {
-        vm.prank(addr);
+        vm.startPrank(addr);
         earthMindConsensusInstance.commitScores(epoch, calculateProposalHash(proposal));
         _refreshBalances();
     }
 
     // fix params sent to revealScores
     function revealScores() external {
-        vm.prank(addr);
+        vm.startPrank(addr);
         earthMindConsensusInstance.revealScores(epoch, proposal.minerAddresses);
         _refreshBalances();
     }
