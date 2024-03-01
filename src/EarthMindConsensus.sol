@@ -52,7 +52,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
 
     mapping(uint256 epoch => mapping(address => MinerProposal)) public minerProposals;
     mapping(uint256 epoch => mapping(address => TopMinersProposal)) public validatorProposals;
-    // mapping(uint256 epoch => )
 
     // TODO Give rewards when win during epoch
     mapping(address miner => uint256 rewardsBalance) public rewardsBalance;
@@ -164,28 +163,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         // As validators are revealing their scores, we add the scores for each miner...
     }
 
-    // consider that you cannot participate in voting decisions that were created before you entered...
-    // research the time frames for exists and enters
-    // epoch maybe as a dependency of the time? Yes time based...
-    // you cannot leave in the middle of an epoch....
-
-    // empty epochs are ok, like empty blocks
-    // like a measure of time to perhaps give rewards.....
-
-    // check chainlink
-    // our network (where does the token live)
-    // eigenlayer (software you are running, living on a p2p network)
-    // similar setup (like off chain network but on chain slashing) (eigenDA to determine the consensus has been achieved)
-
-    // Using Eigenlayer -> Means we are paying for security but we can give other tokens.....
-
-    // Plan: Options:
-
-    // PoA (Easier) (Consensus follow the leader) - V1
-
-    // Eigenlayer (till April)
-    // Own token (Getting integrated into exchanges)
-
     // Internal Functions
     function _requestGovernanceDecision(bytes memory _payload) internal {
         totalEpochs++;
@@ -229,9 +206,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(registry.DESTINATION_CHAIN()));
     }
 
-    // miner 1 -> 10
-    // miner 2 -> 9
-    // miner 3 -> 8
     function aggregateAndPropagateDecisionFromValidatorXToY(uint256 _hint) external {
         // We have all scores
 

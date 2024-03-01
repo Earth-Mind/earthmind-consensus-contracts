@@ -45,7 +45,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.commitProposal(epoch, bytes32(0x0));
     }
 
-    function test_commitProposal_whenEpochHasntStarted_reverts() public {
+    function test_commitProposal_when_epoch_hasnt_started_reverts() public {
         uint256 epoch = 1;
 
         vm.expectRevert("Not at required stage");
@@ -53,7 +53,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
 
-    function test_revealProposal_whenCommitHasntFinished_reverts() public {
+    function test_revealProposal_when_commit_hasnt_finished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -85,7 +85,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
 
-    function test_commitTopMinersProposal_whenMinerRevealHasntFinished_reverts() public {
+    function test_commitTopMinersProposal_when_miner_reveal_hasnt_finished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -166,7 +166,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealTopMinersProposal(epoch, minerAddresses);
     }
 
-    function test_revealTopMinersProposal_whenCommitHasntFinished_reverts() public {
+    function test_revealTopMinersProposal_when_commit_hasnt_finished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
