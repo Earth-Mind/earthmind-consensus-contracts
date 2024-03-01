@@ -238,8 +238,9 @@ contract EarthMindConsensusTest is BaseConsensusTest {
 
         bytes32 commandId = keccak256(payload);
 
-        vm.prank(protocol1.addr());
+        vm.startPrank(protocol1.addr());
 
-        earthMindConsensusInstance.execute(commandId, config.sourceChain, protocol1.addr().toString(), payload);
+        // @dev since we are using a single cross chain setup, the source chain is the destination chain
+        earthMindConsensusInstance.execute(commandId, config.destinationChain, protocol1.addr().toString(), payload);
     }
 }

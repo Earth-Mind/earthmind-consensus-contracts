@@ -6,13 +6,24 @@ import {IAxelarGateway} from "@axelar/interfaces/IAxelarGateway.sol";
 
 import {EarthMindRegistryL1} from "@contracts/EarthMindRegistryL1.sol";
 import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
+import {EarthMindRegistryL1Tester} from "@contracts/test/EarthMindRegistryL1Tester.sol";
 import {CrossChainSetup} from "@contracts/CrossChainSetup.sol";
-import {NoGasPaymentProvided, InvalidSourceAddress, InvalidSourceChain} from "@contracts/Errors.sol";
 import {Configuration} from "@config/Configuration.sol";
 import {StringUtils} from "@contracts/libraries/StringUtils.sol";
 import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
 import {MockProvider} from "@contracts/mocks/MockProvider.sol";
+
+import {
+    NoGasPaymentProvided,
+    InvalidSourceAddress,
+    InvalidSourceChain,
+    ProtocolAlreadyRegistered,
+    ProtocolNotRegistered,
+    MinerAlreadyRegistered,
+    ValidatorAlreadyRegistered,
+    InvalidSetupData
+} from "@contracts/Errors.sol";
 
 import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
 
@@ -47,6 +58,41 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.DESTINATION_ADDRESS().toAddress(), address(earthMindRegistryL2));
     }
 
+    // @dev due to coverage limitations we create a Tester contract to test the internal function _setupData
+    function test_when_setupData_is_wrong_reverts() public {
+        // @dev we deploy a Tester instance
+        EarthMindRegistryL1Tester testerInstance =
+            new EarthMindRegistryL1Tester(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock));
+
+        // @dev we deploy a wrong CrossChainSetup instance
+        vm.startPrank(DEPLOYER);
+
+        CrossChainSetup newCrosschainSetup = new CrossChainSetup(DEPLOYER);
+
+        newCrosschainSetup.setup("0", "0", address(0), address(0));
+
+        vm.stopPrank();
+
+        // @dev we try to call the setup data with wrong data to validate
+        CrossChainSetup.SetupData memory wrongSetupData = newCrosschainSetup.getSetupData();
+
+        vm.expectRevert(InvalidSetupData.selector);
+
+        testerInstance.setupDataWrapper(wrongSetupData);
+    }
+
+    // @dev due to coverage limitations we create a Tester contract to test the internal function _setupData
+    function test_when_setupData_is_correct() public {
+        // @dev we deploy a Tester instance
+        EarthMindRegistryL1Tester testerInstance =
+            new EarthMindRegistryL1Tester(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock));
+
+        testerInstance.setupDataWrapper(crosschainSetup.getSetupData());
+
+        assertEq(earthMindRegistryL1.DESTINATION_CHAIN(), config.destinationChain);
+        assertEq(earthMindRegistryL1.DESTINATION_ADDRESS().toAddress(), address(earthMindRegistryL2));
+    }
+
     function test_protocolRegister() public {
         vm.expectEmit(true, false, false, true);
 
@@ -55,6 +101,16 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         protocol1.registerProtocol{value: 1 ether}();
 
         assertEq(earthMindRegistryL1.protocols(protocol1.addr()), true);
+    }
+
+    function test_protocolRegister_when_already_registered_reverts() public {
+        protocol1.registerProtocol{value: 1 ether}();
+
+        bytes memory registerError = abi.encodeWithSelector(ProtocolAlreadyRegistered.selector, protocol1.addr());
+
+        vm.expectRevert(registerError);
+
+        protocol1.registerProtocol{value: 1 ether}();
     }
 
     function test_protocolRegister_when_no_ether_provided_reverts() public {
@@ -75,6 +131,14 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.protocols(protocol1.addr()), false);
     }
 
+    function test_protocolUnRegister_when_no_register_reverts() public {
+        bytes memory registerError = abi.encodeWithSelector(ProtocolNotRegistered.selector, protocol1.addr());
+
+        vm.expectRevert(registerError);
+
+        protocol1.unRegisterProtocol{value: 1 ether}();
+    }
+
     function test_minerRegister() public {
         vm.expectEmit(true, false, false, true);
 
@@ -85,6 +149,16 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.miners(miner1.addr()), true);
     }
 
+    function test_minerRegister_when_already_registered_reverts() public {
+        miner1.registerMiner{value: 1 ether}();
+
+        bytes memory registerError = abi.encodeWithSelector(MinerAlreadyRegistered.selector, miner1.addr());
+
+        vm.expectRevert(registerError);
+
+        miner1.registerMiner{value: 1 ether}();
+    }
+
     function test_validatorRegister() public {
         vm.expectEmit(true, false, false, true);
 
@@ -93,6 +167,16 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         validator1.registerValidator{value: 1 ether}();
 
         assertEq(earthMindRegistryL1.validators(validator1.addr()), true);
+    }
+
+    function test_validatorRegister_when_already_registered_reverts() public {
+        validator1.registerValidator{value: 1 ether}();
+
+        bytes memory registerError = abi.encodeWithSelector(ValidatorAlreadyRegistered.selector, validator1.addr());
+
+        vm.expectRevert(registerError);
+
+        validator1.registerValidator{value: 1 ether}();
     }
 
     function test_validatorUnregister_whenL2Messages() public {
