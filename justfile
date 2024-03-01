@@ -57,3 +57,6 @@ test_integration skip:
 
 test CONTRACT:
     forge test --mc {{CONTRACT}} -vvvv
+
+test_only CONTRACT TEST:
+    forge test --mc {{CONTRACT}} --mt {{TEST}} -vvvv

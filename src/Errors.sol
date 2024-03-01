@@ -42,3 +42,5 @@ error TopMinerProposalAlreadyRevealed(address validator);
 error TopMinerProposalNotCommitted(address validator);
 
 error EpochEnded();
+
+error InvalidSetupData();
