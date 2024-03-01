@@ -35,7 +35,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         axelarGatewayMock.when(IAxelarGateway.callContract.selector).thenReturns(abi.encode(true));
     }
 
-    function test_ProtocolRegister() public {
+    function test_protocolRegister() public {
         vm.expectEmit(true, false, false, true);
 
         emit ProtocolRegistered(protocol1.addr());
@@ -45,7 +45,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.protocols(protocol1.addr()), true);
     }
 
-    function test_ProtocolUnRegister() public {
+    function test_protocolUnRegister() public {
         protocol1.registerProtocol{value: 1 ether}();
 
         vm.expectEmit(true, false, false, true);
@@ -57,7 +57,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.protocols(protocol1.addr()), false);
     }
 
-    function test_MinerRegister() public {
+    function test_minerRegister() public {
         vm.expectEmit(true, false, false, true);
 
         emit MinerRegistered(miner1.addr());
@@ -67,7 +67,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.miners(miner1.addr()), true);
     }
 
-    function test_ValidatorRegister() public {
+    function test_validatorRegister() public {
         vm.expectEmit(true, false, false, true);
 
         emit ValidatorRegistered(validator1.addr());
@@ -77,7 +77,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.validators(validator1.addr()), true);
     }
 
-    function test_ValidatorUnregister_whenL2Messages() public {
+    function test_validatorUnregister_whenL2Messages() public {
         // @dev only used for interactions where the L2 has to message the L1
         axelarGatewayMock.when(IAxelarGateway.validateContractCall.selector).thenReturns(abi.encode(true));
 
@@ -93,7 +93,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
         );
     }
 
-    function test_MinerUnregister_whenL2Messages() public {
+    function test_minerUnregister_whenL2Messages() public {
         // @dev only used for interactions where the L2 has to message the L1
         axelarGatewayMock.when(IAxelarGateway.validateContractCall.selector).thenReturns(abi.encode(true));
 

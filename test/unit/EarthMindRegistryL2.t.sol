@@ -83,7 +83,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
     }
 
     // External functions
-    function test_MinerUnRegister() public {
+    function test_minerUnRegister() public {
         _registerMinerViaMessage();
 
         vm.expectEmit(true, false, false, true);
@@ -95,7 +95,7 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
         assertEq(earthMindRegistryL1.miners(miner1.addr()), false);
     }
 
-    function test_ValidatorUnRegister() public {
+    function test_validatorUnRegister() public {
         _registerValidatorViaMessage();
 
         vm.expectEmit(true, false, false, true);

@@ -20,7 +20,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester = new TimeBasedEpochsTester();
     }
 
-    function testInitialProperties() public {
+    function test_initialProperties() public {
         assertEq(timeBasedEpochsTester.totalEpochs(), 0);
         assertEq(uint256(timeBasedEpochsTester.getEpochStage(0)), uint256(TimeBasedEpochs.Stage.NonStarted));
         assertEq(timeBasedEpochsTester.getMinerCommitPeriod(), 5 minutes);
@@ -29,7 +29,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         assertEq(timeBasedEpochsTester.getValidatorRevealPeriod(), 5 minutes);
     }
 
-    function testCommitProposal() public {
+    function test_commitProposal() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -45,7 +45,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.commitProposal(epoch, bytes32(0x0));
     }
 
-    function testCommitProposal_whenEpochHasntStarted_reverts() public {
+    function test_commitProposal_whenEpochHasntStarted_reverts() public {
         uint256 epoch = 1;
 
         vm.expectRevert("Not at required stage");
@@ -53,7 +53,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
 
-    function testRevealProposal_whenCommitHasntFinished_reverts() public {
+    function test_revealProposal_whenCommitHasntFinished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -64,7 +64,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
 
-    function testRevealProposal() public {
+    function test_revealProposal() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -85,7 +85,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealProposal(epoch, true, "No issues found");
     }
 
-    function testCommitTopMinersProposal_whenMinerRevealHasntFinished_reverts() public {
+    function test_commitTopMinersProposal_whenMinerRevealHasntFinished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -102,7 +102,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.commitTopMinersProposal(epoch, bytes32(0x0));
     }
 
-    function testCommitTopMinersProposal() public {
+    function test_commitTopMinersProposal() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -129,7 +129,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.commitTopMinersProposal(epoch, bytes32(0x0));
     }
 
-    function testRevealTopMinersProposal() public {
+    function test_revealTopMinersProposal() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -166,7 +166,7 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         timeBasedEpochsTester.revealTopMinersProposal(epoch, minerAddresses);
     }
 
-    function testRevealTopMinersProposal_whenCommitHasntFinished_reverts() public {
+    function test_revealTopMinersProposal_whenCommitHasntFinished_reverts() public {
         uint256 epoch = 1;
         timeBasedEpochsTester.setEpoch(epoch);
 
@@ -196,5 +196,14 @@ contract TimeBasedEpochsTesterTest is BaseTest {
         vm.expectRevert("Not at required stage");
 
         timeBasedEpochsTester.revealTopMinersProposal(epoch, minerAddresses);
+    }
+
+    function test_stageEnded() public {
+        uint256 epoch = 1;
+        timeBasedEpochsTester.setEpoch(epoch);
+
+        _increaseTimeBy(25 minutes);
+
+        assertEq(uint256(timeBasedEpochsTester.getEpochStage(epoch)), uint256(TimeBasedEpochs.Stage.Ended));
     }
 }
