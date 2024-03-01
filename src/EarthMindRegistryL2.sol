@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Strings} from "@openzeppelin/utils/Strings.sol";
-
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
+
+import {AddressUtils} from "./libraries/AddressUtils.sol";
 
 import {MinerNotRegistered, ValidatorNotRegistered} from "./Errors.sol";
 
 contract EarthMindRegistryL2 is EarthMindRegistry {
+    using AddressUtils for address;
+
     constructor(CrossChainSetup _setup, address _gateway, address _gasService)
         EarthMindRegistry(_setup, _gateway, _gasService)
     {
@@ -24,7 +26,7 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
         // @dev Since this is in the L2, the destination chain is the source chain or L1
         DESTINATION_CHAIN = setupData.sourceChain;
-        DESTINATION_ADDRESS = Strings.toHexString(setupData.registryL1);
+        DESTINATION_ADDRESS = setupData.registryL1.toString();
     }
 
     // External functions

@@ -27,6 +27,8 @@ import {
 import {StringUtils} from "./libraries/StringUtils.sol";
 
 contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
+    using StringUtils for string;
+
     IAxelarGasService public immutable gasReceiver;
 
     EarthMindRegistryL2 public registry;
@@ -219,7 +221,7 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     }
 
     function _isValidSourceAddress(string memory sourceAddress) internal view returns (bool) {
-        address addr = StringUtils.stringToAddress(sourceAddress);
+        address addr = sourceAddress.toAddress();
 
         return registry.protocols(addr);
     }

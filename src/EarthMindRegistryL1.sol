@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Strings} from "@openzeppelin/utils/Strings.sol";
-
 import {EarthMindRegistry} from "./EarthMindRegistry.sol";
 import {CrossChainSetup} from "./CrossChainSetup.sol";
+
+import {AddressUtils} from "./libraries/AddressUtils.sol";
 
 import {
     ProtocolAlreadyRegistered,
@@ -14,6 +14,8 @@ import {
 } from "./Errors.sol";
 
 contract EarthMindRegistryL1 is EarthMindRegistry {
+    using AddressUtils for address;
+
     constructor(CrossChainSetup _setup, address _gateway, address _gasService)
         EarthMindRegistry(_setup, _gateway, _gasService)
     {
@@ -25,7 +27,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
         DESTINATION_CHAIN = setupData.destinationChain;
-        DESTINATION_ADDRESS = Strings.toHexString(setupData.registryL2);
+        DESTINATION_ADDRESS = setupData.registryL2.toString();
     }
 
     // External functions
@@ -35,7 +37,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
         super._registerProtocol(msg.sender);
 
-        _bridge(abi.encodeWithSignature("registerProtocol(address)", msg.sender), msg.sender);
+        _bridge(abi.encodeWithSignature("_registerProtocol(address)", msg.sender), msg.sender);
     }
 
     function unRegisterProtocol() external payable {
@@ -43,7 +45,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
         super._unRegisterProtocol(msg.sender);
 
-        _bridge(abi.encodeWithSignature("unRegisterProtocol(address)", msg.sender), msg.sender);
+        _bridge(abi.encodeWithSignature("_unRegisterProtocol(address)", msg.sender), msg.sender);
     }
 
     function registerMiner() external payable {
@@ -51,7 +53,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
         super._registerMiner(msg.sender);
 
-        _bridge(abi.encodeWithSignature("registerMiner(address)", msg.sender), msg.sender);
+        _bridge(abi.encodeWithSignature("_registerMiner(address)", msg.sender), msg.sender);
     }
 
     function registerValidator() external payable {
@@ -59,7 +61,7 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
 
         super._registerValidator(msg.sender);
 
-        _bridge(abi.encodeWithSignature("registerValidator(address)", msg.sender), msg.sender);
+        _bridge(abi.encodeWithSignature("_registerValidator(address)", msg.sender), msg.sender);
     }
 
     // Validating functions

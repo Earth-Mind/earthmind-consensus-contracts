@@ -2,30 +2,26 @@
 pragma solidity 0.8.19;
 
 library StringUtils {
-    function stringToAddress(string memory str) public pure returns (address) {
-        bytes memory stringBytes = bytes(str);
-        require(stringBytes.length == 42, "Invalid address length"); // Including '0x'
+    error InvalidAddressString();
 
-        uint160 integerValue = 0;
-        for (uint256 i = 2; i < 42; i++) {
-            integerValue *= 16;
+    function toAddress(string memory addressString) internal pure returns (address) {
+        bytes memory stringBytes = bytes(addressString);
+        uint160 addressNumber = 0;
+        uint8 stringByte;
 
-            // Convert ASCII character to hex value
-            uint8 charCode = uint8(stringBytes[i]);
-            if (charCode >= 48 && charCode <= 57) {
-                // '0'-'9'
-                integerValue += charCode - 48;
-            } else if (charCode >= 65 && charCode <= 70) {
-                // 'A'-'F'
-                integerValue += charCode - 55;
-            } else if (charCode >= 97 && charCode <= 102) {
-                // 'a'-'f'
-                integerValue += charCode - 87;
-            } else {
-                revert("Invalid character in address");
-            }
+        if (stringBytes.length != 42 || stringBytes[0] != "0" || stringBytes[1] != "x") revert InvalidAddressString();
+
+        for (uint256 i = 2; i < 42; ++i) {
+            stringByte = uint8(stringBytes[i]);
+
+            if ((stringByte >= 97) && (stringByte <= 102)) stringByte -= 87;
+            else if ((stringByte >= 65) && (stringByte <= 70)) stringByte -= 55;
+            else if ((stringByte >= 48) && (stringByte <= 57)) stringByte -= 48;
+            else revert InvalidAddressString();
+
+            addressNumber |= uint160(uint256(stringByte) << ((41 - i) << 2));
         }
 
-        return address(integerValue);
+        return address(addressNumber);
     }
 }

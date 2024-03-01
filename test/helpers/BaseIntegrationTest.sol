@@ -65,6 +65,9 @@ contract BaseIntegrationTest is BaseTest {
         earthMindRegistryL1 = EarthMindRegistryL1(registryAddressL1);
         earthMindRegistryL2 = EarthMindRegistryL2(registryAddressL2);
         earthMindConsensus = EarthMindConsensus(consensusAddress);
+
+        mockGatewayL1 = MockGateway(gatewayAddressL1);
+        mockGatewayL2 = MockGateway(gatewayAddressL2);
     }
 
     function _setupAccounts() internal virtual {
