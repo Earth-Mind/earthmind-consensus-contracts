@@ -5,11 +5,10 @@ import {Constants} from "@constants/Constants.sol";
 
 import {ConfigurationL1Local} from "./Configuration.local.sol";
 import {ConfigurationL2Local} from "./Configuration.local.sol";
-import {ConfigurationMainnet} from "./Configuration.mainnet.sol";
-import {ConfigurationTestnet} from "./Configuration.testnet.sol";
+import {ConfigurationMainnetSourceChain, ConfigurationMainnetDestinationChain} from "./Configuration.mainnet.sol";
+import {ConfigurationTestnetSourceChain, ConfigurationTestnetDestinationChain} from "./Configuration.testnet.sol";
 import {ConfigurationTest} from "./Configuration.test.sol";
 
-import {console2} from "forge-std/Script.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 library Configuration {
@@ -22,27 +21,35 @@ library Configuration {
     }
 
     function getConfiguration(Vm _vm, string memory _networkId) external view returns (ConfigValues memory) {
-        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.MAINNET_NETWORK))) {
-            return ConfigurationMainnet.getConfig();
+        bytes32 networkHash = keccak256(abi.encodePacked(_networkId));
+
+        if (networkHash == keccak256(abi.encodePacked(Constants.ETHEREUM_MAINNET_NETWORK))) {
+            return ConfigurationMainnetSourceChain.getConfig();
         }
 
-        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.TESTNET_NETWORK))) {
-            return ConfigurationTestnet.getConfig();
+        if (networkHash == keccak256(abi.encodePacked(Constants.BASE_MAINNET_NETWORK))) {
+            return ConfigurationMainnetDestinationChain.getConfig();
         }
 
-        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_L1_NETWORK))) {
+        if (networkHash == keccak256(abi.encodePacked(Constants.ETHEREUM_SEPOLIA_NETWORK))) {
+            return ConfigurationTestnetSourceChain.getConfig();
+        }
+
+        if (networkHash == keccak256(abi.encodePacked(Constants.BASE_TESTNET_NETWORK))) {
+            return ConfigurationTestnetDestinationChain.getConfig();
+        }
+
+        if (networkHash == keccak256(abi.encodePacked(Constants.LOCAL_L1_NETWORK))) {
             return ConfigurationL1Local.getConfig(_vm);
         }
 
-        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_L2_NETWORK))) {
+        if (networkHash == keccak256(abi.encodePacked(Constants.LOCAL_L2_NETWORK))) {
             return ConfigurationL2Local.getConfig(_vm);
         }
 
-        if (keccak256(abi.encodePacked(_networkId)) == keccak256(abi.encodePacked(Constants.LOCAL_TEST_NETWORK))) {
+        if (networkHash == keccak256(abi.encodePacked(Constants.LOCAL_TEST_NETWORK))) {
             return ConfigurationTest.getConfig();
         }
-
-        console2.log("Configuration: network not supported {}", _networkId);
 
         revert("Configuration: network not supported");
     }

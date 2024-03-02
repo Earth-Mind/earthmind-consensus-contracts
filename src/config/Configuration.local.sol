@@ -11,7 +11,6 @@ import {Vm} from "forge-std/Vm.sol";
 library ConfigurationL1Local {
     using DeploymentUtils for Vm;
 
-    bytes32 private constant SALT = hex"65617274686D696E64"; // earthmind
     string private constant SOURCE_CHAIN = Constants.LOCAL_L1_NETWORK;
     string private constant DESTINATION_CHAIN = Constants.LOCAL_L2_NETWORK;
 
@@ -19,14 +18,15 @@ library ConfigurationL1Local {
         address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
         address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
 
-        return Configuration.ConfigValues(SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
+        return Configuration.ConfigValues(
+            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
+        );
     }
 }
 
 library ConfigurationL2Local {
     using DeploymentUtils for Vm;
 
-    bytes32 private constant SALT = hex"65617274686D696E64"; // earthmind
     string private constant SOURCE_CHAIN = Constants.LOCAL_L2_NETWORK;
     string private constant DESTINATION_CHAIN = Constants.LOCAL_L1_NETWORK;
 
@@ -34,6 +34,8 @@ library ConfigurationL2Local {
         address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
         address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
 
-        return Configuration.ConfigValues(SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
+        return Configuration.ConfigValues(
+            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
+        );
     }
 }

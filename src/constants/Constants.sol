@@ -2,8 +2,11 @@
 pragma solidity 0.8.19;
 
 library Constants {
-    string public constant MAINNET_NETWORK = "1";
-    string public constant TESTNET_NETWORK = "2";
+    bytes32 public constant SALT = hex"65617274686D696E64"; // earthmind
+    string public constant ETHEREUM_MAINNET_NETWORK = "1";
+    string public constant ETHEREUM_SEPOLIA_NETWORK = "11155111";
+    string public constant BASE_MAINNET_NETWORK = "8453";
+    string public constant BASE_TESTNET_NETWORK = "84531";
     string public constant LOCAL_L1_NETWORK = "31337";
     string public constant LOCAL_L2_NETWORK = "31338";
     string public constant LOCAL_TEST_NETWORK = "3137";
