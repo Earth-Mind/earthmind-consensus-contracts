@@ -3,6 +3,7 @@ pragma solidity 0.8.19;
 
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseIntegrationTest} from "../helpers/BaseIntegrationTest.sol";
 import {Miner} from "../helpers/Miner.sol";
@@ -29,7 +30,9 @@ contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
 
         miner1.registerMiner{value: 1 ether}();
 
-        _bridgeFromL1ToL2();
+        bytes32 commandId = keccak256(abi.encodePacked("registerMiner", miner1.addr()));
+
+        _bridgeFromL1ToL2(commandId);
 
         vm.selectFork(networkL2);
 
@@ -38,17 +41,27 @@ contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
         assertTrue(isRegistered, "Miner is not registered");
     }
 
-    function _bridgeFromL1ToL2() internal {
+    function _bridgeFromL1ToL2(bytes32 _commandId) internal {
         vm.selectFork(networkL1);
 
         MockGateway.ContractCallParams memory lastcall = mockGatewayL1.getLastContractCall();
 
-        bytes32 commandId = keccak256(abi.encodePacked("registerMiner", miner1.addr()));
-
         vm.selectFork(networkL2);
 
         earthMindRegistryL2.execute(
-            commandId, lastcall.destinationChain, address(earthMindRegistryL1).toString(), lastcall.payload
+            _commandId, Constants.LOCAL_L1_NETWORK, address(earthMindRegistryL1).toString(), lastcall.payload
+        );
+    }
+
+    function _bridgeFromL2ToL1(bytes32 _commandId) internal {
+        vm.selectFork(networkL2);
+
+        MockGateway.ContractCallParams memory lastcall = mockGatewayL1.getLastContractCall();
+
+        vm.selectFork(networkL1);
+
+        earthMindRegistryL2.execute(
+            _commandId, Constants.LOCAL_L2_NETWORK, address(earthMindRegistryL2).toString(), lastcall.payload
         );
     }
 }
