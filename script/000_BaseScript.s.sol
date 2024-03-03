@@ -14,6 +14,8 @@ contract BaseScript is Script {
     Configuration.ConfigValues internal config;
     address internal deployer;
 
+    bool private SKIP_LOAD_CONFIG_FROM_DISK = false;
+
     struct Deployment {
         string name;
         address addr;
@@ -25,7 +27,9 @@ contract BaseScript is Script {
     constructor() {
         string memory networkId = vm.envString("NETWORK_ID");
 
-        config = vm.getConfiguration(networkId);
+        if (!_skipLoadConfig()) {
+            config = vm.getConfiguration(networkId);
+        }
 
         deployer = vm.loadDeployerAddress();
 
@@ -34,5 +38,9 @@ contract BaseScript is Script {
         deploymentsPath = string.concat(root, "/deployments/");
 
         folderPath = string.concat(deploymentsPath, networkId);
+    }
+
+    function _skipLoadConfig() internal view virtual returns (bool) {
+        return SKIP_LOAD_CONFIG_FROM_DISK;
     }
 }

@@ -31,13 +31,13 @@ contract DeployRegistryL1Script is BaseScript {
             abi.encode(crosschainSetupAddress, config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
         );
 
-        address registryL1ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL1));
+        address registryL1ComputedAddress = create2Deployer.computeAddress(Constants.SALT, keccak256(creationCodeL1));
 
         console2.log("Computed address of EarthMindRegistryL1");
         console2.logAddress(registryL1ComputedAddress);
 
         // deploy the registry contracts
-        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, config.salt, creationCodeL1);
+        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, Constants.SALT, creationCodeL1);
 
         assert(deployedAddressOfRegistryL1 == registryL1ComputedAddress);
 

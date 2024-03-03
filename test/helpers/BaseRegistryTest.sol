@@ -74,7 +74,7 @@ contract BaseRegistryTest is BaseTest {
             abi.encode(crosschainSetup, address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address registryL1ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL1));
+        address registryL1ComputedAddress = create2Deployer.computeAddress(Constants.SALT, keccak256(creationCodeL1));
         console2.log("The RegistryL1 address: %s", registryL1ComputedAddress);
 
         // calculate the address of the RegistryL2 contract
@@ -83,7 +83,7 @@ contract BaseRegistryTest is BaseTest {
             abi.encode(address(crosschainSetup), address(axelarGatewayMock), address(axelarGasServiceMock)) // Encoding all constructor arguments
         );
 
-        address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
+        address registryL2ComputedAddress = create2Deployer.computeAddress(Constants.SALT, keccak256(creationCodeL2));
         console2.log("The RegistryL2 address: %s", registryL2ComputedAddress);
 
         // setup the crosschain setup contract
@@ -97,8 +97,8 @@ contract BaseRegistryTest is BaseTest {
         );
 
         // deploy the registry contracts
-        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, config.salt, creationCodeL1);
-        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, config.salt, creationCodeL2);
+        address deployedAddressOfRegistryL1 = create2Deployer.deploy(0, Constants.SALT, creationCodeL1);
+        address deployedAddressOfRegistryL2 = create2Deployer.deploy(0, Constants.SALT, creationCodeL2);
 
         earthMindRegistryL1 = EarthMindRegistryL1(deployedAddressOfRegistryL1);
         earthMindRegistryL2 = EarthMindRegistryL2(deployedAddressOfRegistryL2);

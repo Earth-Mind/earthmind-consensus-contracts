@@ -36,7 +36,7 @@ contract DeployCrossChainSetupScript is BaseScript {
         );
 
         address crosschainSetupComputedAddress =
-            create2Deployer.computeAddress(config.salt, keccak256(crosschainSetupCreationCode));
+            create2Deployer.computeAddress(Constants.SALT, keccak256(crosschainSetupCreationCode));
 
         console2.log("Computed address of CrossChainSetup");
         console2.logAddress(crosschainSetupComputedAddress);
@@ -46,17 +46,18 @@ contract DeployCrossChainSetupScript is BaseScript {
             type(EarthMindRegistryL1).creationCode,
             abi.encode(crosschainSetupComputedAddress, config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
         );
-        address registryL1ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL1));
+        address registryL1ComputedAddress = create2Deployer.computeAddress(Constants.SALT, keccak256(creationCodeL1));
 
         // calculate the address of the RegistryL2 contract
         bytes memory creationCodeL2 = abi.encodePacked(
             type(EarthMindRegistryL2).creationCode,
             abi.encode(address(crosschainSetupComputedAddress), config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
         );
-        address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
+        address registryL2ComputedAddress = create2Deployer.computeAddress(Constants.SALT, keccak256(creationCodeL2));
 
         // deploy the crosschain setup contract
-        address deployedAddressOfCrossChainSetup = create2Deployer.deploy(0, config.salt, crosschainSetupCreationCode);
+        address deployedAddressOfCrossChainSetup =
+            create2Deployer.deploy(0, Constants.SALT, crosschainSetupCreationCode);
 
         assert(deployedAddressOfCrossChainSetup == crosschainSetupComputedAddress);
 

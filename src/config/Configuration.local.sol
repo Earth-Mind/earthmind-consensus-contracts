@@ -18,9 +18,7 @@ library ConfigurationL1Local {
         address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
         address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
 
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }
 
@@ -34,8 +32,6 @@ library ConfigurationL2Local {
         address AXELAR_GATEWAY = vm.loadDeploymentAddress(Constants.MOCK_GATEWAY);
         address AXELAR_GAS_SERVICE = vm.loadDeploymentAddress(Constants.MOCK_GAS_RECEIVER);
 
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }

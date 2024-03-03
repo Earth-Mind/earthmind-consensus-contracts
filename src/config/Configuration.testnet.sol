@@ -13,9 +13,7 @@ library ConfigurationTestnetSourceChain {
     address private constant AXELAR_GAS_SERVICE = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6;
 
     function getConfig() external pure returns (Configuration.ConfigValues memory) {
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }
 
@@ -26,8 +24,6 @@ library ConfigurationTestnetDestinationChain {
     address private constant AXELAR_GAS_SERVICE = 0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6;
 
     function getConfig() external pure returns (Configuration.ConfigValues memory) {
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }

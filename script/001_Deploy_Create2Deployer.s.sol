@@ -13,6 +13,8 @@ import {Vm} from "forge-std/Vm.sol";
 contract DeployCreate2DeployerScript is BaseScript {
     using DeploymentUtils for Vm;
 
+    bool private SKIP_CONFIGURATION = true;
+
     function run() public {
         console2.log("Deploying Create2Deployer contract");
         console2.log("Deployer Address");
@@ -25,5 +27,9 @@ contract DeployCreate2DeployerScript is BaseScript {
         console2.logAddress(address(create2Deployer));
 
         vm.saveDeploymentAddress(Constants.CREATE2_DEPLOYER, address(create2Deployer));
+    }
+
+    function _skipLoadConfig() internal view override returns (bool) {
+        return SKIP_CONFIGURATION;
     }
 }

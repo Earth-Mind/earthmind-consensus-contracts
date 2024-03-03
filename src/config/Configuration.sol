@@ -13,7 +13,6 @@ import {Vm} from "forge-std/Vm.sol";
 
 library Configuration {
     struct ConfigValues {
-        bytes32 salt;
         string sourceChain;
         string destinationChain;
         address axelarGateway;

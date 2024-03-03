@@ -14,8 +14,6 @@ library ConfigurationTest {
     address private constant AXELAR_GAS_SERVICE = address(0); // there is not need to declare any addresses
 
     function getConfig() external pure returns (Configuration.ConfigValues memory) {
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }

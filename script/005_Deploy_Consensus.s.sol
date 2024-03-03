@@ -32,13 +32,14 @@ contract DeployConsensusScript is BaseScript {
             abi.encode(crosschainSetupAddress, config.axelarGateway, config.axelarGasService) // Encoding all constructor arguments
         );
 
-        address consensusComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(consensusCreationCode));
+        address consensusComputedAddress =
+            create2Deployer.computeAddress(Constants.SALT, keccak256(consensusCreationCode));
 
         console2.log("Computed address of EarthMindConsensus");
         console2.logAddress(consensusComputedAddress);
 
         // deploy the consensus contract
-        address deployedAddressOfConsensus = create2Deployer.deploy(0, config.salt, consensusCreationCode);
+        address deployedAddressOfConsensus = create2Deployer.deploy(0, Constants.SALT, consensusCreationCode);
 
         assert(deployedAddressOfConsensus == consensusComputedAddress);
 

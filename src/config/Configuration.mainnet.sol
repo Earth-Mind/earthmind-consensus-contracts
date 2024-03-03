@@ -13,9 +13,7 @@ library ConfigurationMainnetSourceChain {
     address private constant AXELAR_GAS_SERVICE = 0x2d5d7d31F671F86C782533cc367F14109a082712;
 
     function getConfig() external pure returns (Configuration.ConfigValues memory) {
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }
 
@@ -26,8 +24,6 @@ library ConfigurationMainnetDestinationChain {
     address private constant AXELAR_GAS_SERVICE = 0x2d5d7d31F671F86C782533cc367F14109a082712;
 
     function getConfig() external pure returns (Configuration.ConfigValues memory) {
-        return Configuration.ConfigValues(
-            Constants.SALT, SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE
-        );
+        return Configuration.ConfigValues(SOURCE_CHAIN, DESTINATION_CHAIN, AXELAR_GATEWAY, AXELAR_GAS_SERVICE);
     }
 }

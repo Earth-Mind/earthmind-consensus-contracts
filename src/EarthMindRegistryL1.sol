@@ -27,12 +27,12 @@ contract EarthMindRegistryL1 is EarthMindRegistry {
     // Override functions
 
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
-        if (
-            keccak256(abi.encode(setupData.destinationChain)) == keccak256(abi.encode(0))
-                || setupData.registryL2 == address(0)
-        ) {
+        bytes32 destinationChain = keccak256(abi.encode(setupData.destinationChain));
+
+        if (destinationChain == keccak256(abi.encode("0")) || setupData.registryL1 == address(0)) {
             revert InvalidSetupData();
         }
+
         DESTINATION_CHAIN = setupData.destinationChain;
         DESTINATION_ADDRESS = setupData.registryL2.toString();
     }
