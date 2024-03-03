@@ -35,7 +35,14 @@ contract CrossChainSetupTest is Test {
 
         vm.startPrank(deployer);
 
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
+        crossChainSetupInstance.setup(
+            CrossChainSetup.SetupData({
+                sourceChain: sourceChain,
+                destinationChain: destinationChain,
+                registryL1: registryL1,
+                registryL2: registryL2
+            })
+        );
 
         assertEq(crossChainSetupInstance.initialised(), true);
 
@@ -54,11 +61,25 @@ contract CrossChainSetupTest is Test {
 
         vm.startPrank(deployer);
 
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
+        crossChainSetupInstance.setup(
+            CrossChainSetup.SetupData({
+                sourceChain: sourceChain,
+                destinationChain: destinationChain,
+                registryL1: registryL1,
+                registryL2: registryL2
+            })
+        );
 
         vm.expectRevert(CrossChainSetupHasBeenInitialised.selector);
 
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
+        crossChainSetupInstance.setup(
+            CrossChainSetup.SetupData({
+                sourceChain: sourceChain,
+                destinationChain: destinationChain,
+                registryL1: registryL1,
+                registryL2: registryL2
+            })
+        );
     }
 
     function test_setup_when_non_owner_reverts() public {
@@ -69,6 +90,13 @@ contract CrossChainSetupTest is Test {
 
         vm.expectRevert("Ownable: caller is not the owner");
 
-        crossChainSetupInstance.setup(sourceChain, destinationChain, registryL1, registryL2);
+        crossChainSetupInstance.setup(
+            CrossChainSetup.SetupData({
+                sourceChain: sourceChain,
+                destinationChain: destinationChain,
+                registryL1: registryL1,
+                registryL2: registryL2
+            })
+        );
     }
 }

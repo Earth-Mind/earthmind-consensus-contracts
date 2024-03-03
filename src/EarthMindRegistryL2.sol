@@ -24,10 +24,9 @@ contract EarthMindRegistryL2 is EarthMindRegistry {
     // Override functions
 
     function _setupData(CrossChainSetup.SetupData memory setupData) internal override {
-        // @dev Since this is in the L2, the destination chain is the source chain or L1
         if (
             keccak256(abi.encode(setupData.destinationChain)) == keccak256(abi.encode(0))
-                || setupData.registryL2 == address(0)
+                || setupData.registryL1 == address(0)
         ) {
             revert InvalidSetupData();
         }

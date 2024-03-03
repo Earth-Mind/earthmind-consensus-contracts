@@ -20,8 +20,6 @@ import {MinerNotRegistered, ValidatorNotRegistered, InvalidSetupData} from "@con
 
 import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
 
-import "forge-std/console2.sol";
-
 contract EarthMindRegistryL2Test is BaseRegistryTest {
     using StringUtils for string;
     using AddressUtils for address;
@@ -103,7 +101,14 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
 
         CrossChainSetup newCrosschainSetup = new CrossChainSetup(DEPLOYER);
 
-        newCrosschainSetup.setup("0", "0", address(0), address(0));
+        newCrosschainSetup.setup(
+            CrossChainSetup.SetupData({
+                destinationChain: "0",
+                sourceChain: "0",
+                registryL1: address(0),
+                registryL2: address(0)
+            })
+        );
 
         vm.stopPrank();
 
@@ -201,8 +206,6 @@ contract EarthMindRegistryL2Test is BaseRegistryTest {
     function _sendMessage(bytes32 _commandId, bytes memory _payload) internal {
         // @dev Be aware that the source chain is the L2 chain in reality but since we are using just 1 chain for unit testing we use the
         // destination chain as the source chain (in this case the L2 becomes the source chain)
-        earthMindRegistryL2.execute(
-            _commandId, config.destinationChain, address(earthMindRegistryL1).toString(), _payload
-        );
+        earthMindRegistryL2.execute(_commandId, config.sourceChain, address(earthMindRegistryL1).toString(), _payload);
     }
 }

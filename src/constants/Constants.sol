@@ -3,6 +3,7 @@ pragma solidity 0.8.19;
 
 library Constants {
     bytes32 public constant SALT = hex"65617274686D696E64"; // earthmind
+    address public constant FOUNDRY_CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
     string public constant ETHEREUM_MAINNET_NETWORK = "1";
     string public constant ETHEREUM_SEPOLIA_NETWORK = "11155111";
     string public constant BASE_MAINNET_NETWORK = "8453";

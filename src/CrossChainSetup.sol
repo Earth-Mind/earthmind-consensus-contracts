@@ -23,22 +23,14 @@ contract CrossChainSetup is Ownable {
         _transferOwnership(_newOwner);
     }
 
-    function setup(
-        string memory _sourceChain,
-        string memory _destinationChain,
-        address _registryL1,
-        address _registryL2
-    ) external onlyOwner {
+    function setup(SetupData memory _data) external onlyOwner {
         if (initialised) {
             revert CrossChainSetupHasBeenInitialised();
         }
 
         initialised = true;
 
-        setupData.sourceChain = _sourceChain;
-        setupData.destinationChain = _destinationChain;
-        setupData.registryL1 = _registryL1;
-        setupData.registryL2 = _registryL2;
+        setupData = _data;
     }
 
     function getSetupData() external view returns (SetupData memory) {

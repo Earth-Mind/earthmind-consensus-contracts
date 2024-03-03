@@ -27,8 +27,6 @@ import {
 
 import {BaseRegistryTest} from "../helpers/BaseRegistryTest.sol";
 
-import "forge-std/console2.sol";
-
 contract EarthMindRegistryL1Test is BaseRegistryTest {
     using StringUtils for string;
     using AddressUtils for address;
@@ -69,7 +67,14 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         CrossChainSetup newCrosschainSetup = new CrossChainSetup(DEPLOYER);
 
-        newCrosschainSetup.setup("0", "0", address(0), address(0));
+        newCrosschainSetup.setup(
+            CrossChainSetup.SetupData({
+                destinationChain: "0",
+                sourceChain: "0",
+                registryL1: address(0),
+                registryL2: address(0)
+            })
+        );
 
         vm.stopPrank();
 

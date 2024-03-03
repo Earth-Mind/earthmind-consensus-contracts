@@ -6,8 +6,10 @@ import {Constants} from "@constants/Constants.sol";
 import {Configuration} from "./Configuration.sol";
 
 library ConfigurationTest {
-    string private constant SOURCE_CHAIN = Constants.LOCAL_L1_NETWORK;
-    string private constant DESTINATION_CHAIN = Constants.LOCAL_L2_NETWORK;
+    // @dev Since this is used for unit test, we deploy the contracts in the same network, hence the
+    // SOURCE_CHAIN and DESTINATION_CHAIN are the same
+    string private constant SOURCE_CHAIN = Constants.LOCAL_TEST_NETWORK;
+    string private constant DESTINATION_CHAIN = Constants.LOCAL_TEST_NETWORK;
     address private constant AXELAR_GATEWAY = address(0); // @dev Since these contracts are deploying in the unit test
     address private constant AXELAR_GAS_SERVICE = address(0); // there is not need to declare any addresses
 

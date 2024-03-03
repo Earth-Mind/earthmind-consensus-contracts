@@ -56,7 +56,7 @@ test_integration skip:
     forge test --match-path "*/integration/*.sol" -vvvv
 
 test CONTRACT:
-    forge test --mc {{CONTRACT}} -vvvv
+    NETWORK_ID=3137 forge test --mc {{CONTRACT}} -vvvv
 
 test_only CONTRACT TEST:
-    forge test --mc {{CONTRACT}} --mt {{TEST}} -vvvv
+    NETWORK_ID=3137 forge test --mc {{CONTRACT}} --mt {{TEST}} -vvv

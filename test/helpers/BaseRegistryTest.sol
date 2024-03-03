@@ -12,6 +12,7 @@ import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 import {MockProvider} from "@contracts/mocks/MockProvider.sol";
 
 import {Configuration} from "@config/Configuration.sol";
+import {Constants} from "@constants/Constants.sol";
 
 import {BaseAccount} from "./BaseAccount.sol";
 import {Validator} from "./Validator.sol";
@@ -31,10 +32,10 @@ contract BaseRegistryTest is BaseTest {
     // Instances
     MockProvider internal axelarGatewayMock;
     MockProvider internal axelarGasServiceMock;
-
     Create2Deployer internal create2Deployer;
     EarthMindRegistryL1 internal earthMindRegistryL1;
     EarthMindRegistryL2 internal earthMindRegistryL2;
+
     CrossChainSetup internal crosschainSetup;
 
     address internal DEPLOYER = vm.addr(1234);
@@ -60,9 +61,8 @@ contract BaseRegistryTest is BaseTest {
     function _deploy() internal virtual {
         vm.startPrank(DEPLOYER);
 
-        // we deploy a deployer contract to deploy the registry contracts
-        create2Deployer = new Create2Deployer();
         crosschainSetup = new CrossChainSetup(DEPLOYER);
+        create2Deployer = new Create2Deployer();
 
         // setup mock providers
         axelarGatewayMock = new MockProvider();
@@ -86,9 +86,14 @@ contract BaseRegistryTest is BaseTest {
         address registryL2ComputedAddress = create2Deployer.computeAddress(config.salt, keccak256(creationCodeL2));
         console2.log("The RegistryL2 address: %s", registryL2ComputedAddress);
 
-        // setup the crosschain setup contract with the addresses of the registry contracts
+        // setup the crosschain setup contract
         crosschainSetup.setup(
-            config.sourceChain, config.destinationChain, registryL1ComputedAddress, registryL2ComputedAddress
+            CrossChainSetup.SetupData({
+                sourceChain: config.sourceChain,
+                destinationChain: config.destinationChain,
+                registryL1: registryL1ComputedAddress,
+                registryL2: registryL2ComputedAddress
+            })
         );
 
         // deploy the registry contracts

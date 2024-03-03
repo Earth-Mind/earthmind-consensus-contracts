@@ -64,7 +64,12 @@ contract DeployCrossChainSetupScript is BaseScript {
 
         // setup the crosschain setup contract with the addresses of the registry contracts
         crosschainSetup.setup(
-            config.sourceChain, config.destinationChain, registryL1ComputedAddress, registryL2ComputedAddress
+            CrossChainSetup.SetupData({
+                sourceChain: config.sourceChain,
+                destinationChain: config.destinationChain,
+                registryL1: registryL1ComputedAddress,
+                registryL2: registryL2ComputedAddress
+            })
         );
 
         vm.saveDeploymentAddress(Constants.CROSS_CHAIN_SETUP, deployedAddressOfCrossChainSetup);
