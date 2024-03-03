@@ -46,8 +46,8 @@ test_unit:
     NETWORK_ID=3137 forge test --match-path "test/unit/**/*.sol"
 
 test_coverage:
-    forge coverage --report lcov 
-    lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script' 'DeployerUtils.sol' 'DeploymentUtils.sol'
+    NETWORK_ID=3137 forge coverage --report lcov 
+    lcov --remove ./lcov.info --output-file ./lcov.info 'config' 'test' 'script' 'DeployerUtils.sol' 'DeploymentUtils.sol' 'AddressUtils.sol' 'StringUtils.sol'
     genhtml lcov.info -o coverage --branch-coverage --ignore-errors category
 
 test_integration skip:
