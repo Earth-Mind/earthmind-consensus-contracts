@@ -7,7 +7,7 @@ import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 import {Constants} from "@constants/Constants.sol";
 import {BaseScript} from "./000_BaseScript.s.sol";
 
-import {console2} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 contract DeployCreate2DeployerScript is BaseScript {

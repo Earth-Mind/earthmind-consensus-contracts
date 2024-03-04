@@ -9,7 +9,7 @@ import {Constants} from "@constants/Constants.sol";
 
 import {BaseScript} from "./000_BaseScript.s.sol";
 
-import {console2} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 contract DeployAxelarMockScript is BaseScript {
