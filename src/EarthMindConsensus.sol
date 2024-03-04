@@ -196,6 +196,7 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         _requestGovernanceDecision(_payload);
     }
 
+    // @dev This function should be called by the protocol itself via cross chain message
     function _isValidSourceAddress(string memory sourceAddress) internal view returns (bool) {
         address addr = sourceAddress.toAddress();
 

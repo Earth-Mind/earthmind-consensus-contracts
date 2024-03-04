@@ -9,6 +9,21 @@ import {TimeBasedEpochs} from "@contracts/TimeBasedEpochs.sol";
 import {Configuration} from "@config/Configuration.sol";
 import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
+import {
+    ProposalAlreadyCommitted,
+    ProposalAlreadyRevealed,
+    ProposalNotCommitted,
+    InvalidProposal,
+    InvalidMiner,
+    InvalidValidator,
+    TopMinerProposalAlreadyCommitted,
+    TopMinerProposalAlreadyRevealed,
+    TopMinerProposalNotCommitted,
+    InvalidTopMinerProposal,
+    InvalidSourceChain,
+    InvalidSourceAddress
+} from "@contracts/Errors.sol";
+
 import {BaseConsensusTest} from "../helpers/BaseConsensusTest.sol";
 
 contract EarthMindConsensusTest is BaseConsensusTest {
@@ -89,10 +104,6 @@ contract EarthMindConsensusTest is BaseConsensusTest {
     }
 
     function test_proposalReceived() public {
-        // protocol register first
-        _registerProtocolViaMessage(protocol1.addr());
-
-        // request a proposal
         _requestGovernanceDecision();
 
         // assert that the total epochs are 1
@@ -109,11 +120,8 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         assertEq(epochResult.sender, protocol1.addr());
     }
 
-    function test_commitProposal_when_minerSubmitsProposal() public {
-        // protocol register first
-        _registerProtocolViaMessage(protocol1.addr());
-
-        // request a proposal
+    // Miners tests
+    function test_commitProposal() public {
         _requestGovernanceDecision();
 
         miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
@@ -131,9 +139,35 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         // assert more data
     }
 
-    function test_revealProposal_when_commitPeriodHasntFinished_reverts() public {
-        _registerProtocolViaMessage(protocol1.addr());
+    function test_commitProposal_when_alreadyCommitted_reverts() public {
+        _requestGovernanceDecision();
 
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        bytes memory bytesError = abi.encodeWithSelector(ProposalAlreadyCommitted.selector, miner1.addr());
+
+        vm.expectRevert(bytesError);
+
+        miner1.commitProposal();
+    }
+
+    function test_commitProposal_when_sender_is_not_miner_reverts() public {
+        uint256 epochId = 1;
+
+        _requestGovernanceDecision();
+
+        bytes memory bytesError = abi.encodeWithSelector(InvalidMiner.selector, DEPLOYER);
+
+        vm.expectRevert(bytesError);
+
+        vm.startPrank(DEPLOYER);
+
+        earthMindConsensusInstance.commitProposal(epochId, bytes32(0x0));
+    }
+
+    function test_revealProposal_when_commitPeriod_hasnt_finished_reverts() public {
         _requestGovernanceDecision();
 
         miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
@@ -145,9 +179,7 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         miner1.revealProposal();
     }
 
-    function test_revealProposal_when_commitPeriodHasFinished() public {
-        _registerProtocolViaMessage(protocol1.addr());
-
+    function test_revealProposal_when_commitPeriod_has_finished() public {
         _requestGovernanceDecision();
 
         miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
@@ -161,20 +193,60 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         emit ProposalRevealed(1, miner1.addr(), true, "No issues found");
 
         miner1.revealProposal();
-        // assert more data
     }
-    // TODO
-    // when ProposalNotCommitted
-    // when ProposalAlreadyRevealed
-    // when wrong stage
-    // when not miner
-    // when reveal doesnt match
-    // assertEvent
-    // asset proposal isRevealed = true
 
-    function test_commitScore_when_validatorCommits() public {
-        _registerProtocolViaMessage(protocol1.addr());
+    function test_revealProposal_when_has_been_revealed_reverts() public {
+        _requestGovernanceDecision();
 
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        bytes memory bytesError = abi.encodeWithSelector(ProposalAlreadyRevealed.selector, miner1.addr());
+
+        vm.expectRevert(bytesError);
+
+        miner1.revealProposal();
+    }
+
+    function test_revealProposal_when_not_commited_before_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        bytes memory bytesError = abi.encodeWithSelector(ProposalNotCommitted.selector, miner1.addr());
+
+        vm.expectRevert(bytesError);
+
+        miner1.revealProposal();
+    }
+
+    function test_revealProposal_when_hashes_dont_match_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.setProposalInfo(PROPOSAL_ID, false, "No issues found and more");
+
+        bytes memory bytesError = abi.encodeWithSelector(InvalidProposal.selector, miner1.addr());
+
+        vm.expectRevert(bytesError);
+
+        miner1.revealProposal();
+    }
+
+    // Validators tests
+    function test_commitScore() public {
         _requestGovernanceDecision();
 
         miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
@@ -199,9 +271,58 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         validator1.commitScores();
     }
 
-    function test_revealScore_when_validatorCommits() public {
-        _registerProtocolViaMessage(protocol1.addr());
+    function test_commitScore_when_validator_not_registered_reverts() public {
+        _requestGovernanceDecision();
 
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        _increaseTimeBy(MINER_REVEAL_PERIOD);
+
+        uint256 epochId = 2;
+
+        bytes memory bytesError = abi.encodeWithSelector(InvalidValidator.selector, DEPLOYER);
+
+        vm.expectRevert(bytesError);
+
+        vm.startPrank(DEPLOYER);
+
+        earthMindConsensusInstance.commitScores(epochId, bytes32(0x0));
+    }
+
+    function test_commitScore_when_already_committed_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        _increaseTimeBy(MINER_REVEAL_PERIOD);
+
+        address[] memory minerAddresses = new address[](1);
+        minerAddresses[0] = miner1.addr();
+
+        validator1.setProposalInfo(PROPOSAL_ID, minerAddresses);
+
+        validator1.commitScores();
+
+        bytes memory bytesError = abi.encodeWithSelector(TopMinerProposalAlreadyCommitted.selector, validator1.addr());
+
+        vm.expectRevert(bytesError);
+
+        validator1.commitScores();
+    }
+
+    function test_revealScore() public {
         _requestGovernanceDecision();
 
         miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
@@ -230,6 +351,133 @@ contract EarthMindConsensusTest is BaseConsensusTest {
         validator1.revealScores();
     }
 
+    function test_revealScore_when_already_revealed_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        _increaseTimeBy(MINER_REVEAL_PERIOD);
+
+        address[] memory minerAddresses = new address[](1);
+        minerAddresses[0] = miner1.addr();
+
+        validator1.setProposalInfo(PROPOSAL_ID, minerAddresses);
+
+        validator1.commitScores();
+
+        _increaseTimeBy(VALIDATOR_COMMIT_PERIOD);
+
+        validator1.revealScores();
+
+        bytes memory bytesError = abi.encodeWithSelector(TopMinerProposalAlreadyRevealed.selector, validator1.addr());
+
+        vm.expectRevert(bytesError);
+
+        validator1.revealScores();
+    }
+
+    function test_revealScore_when_not_committed_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        _increaseTimeBy(MINER_REVEAL_PERIOD);
+
+        address[] memory minerAddresses = new address[](1);
+        minerAddresses[0] = miner1.addr();
+
+        validator1.setProposalInfo(PROPOSAL_ID, minerAddresses);
+
+        _increaseTimeBy(VALIDATOR_COMMIT_PERIOD);
+
+        bytes memory bytesError = abi.encodeWithSelector(TopMinerProposalNotCommitted.selector, validator1.addr());
+
+        vm.expectRevert(bytesError);
+
+        validator1.revealScores();
+    }
+
+    function test_revealScore_when_hashes_dont_match_reverts() public {
+        _requestGovernanceDecision();
+
+        miner1.setProposalInfo(PROPOSAL_ID, true, "No issues found");
+
+        miner1.commitProposal();
+
+        _increaseTimeBy(MINER_COMMIT_PERIOD);
+
+        miner1.revealProposal();
+
+        _increaseTimeBy(MINER_REVEAL_PERIOD);
+
+        address[] memory minerAddresses = new address[](1);
+        minerAddresses[0] = miner1.addr();
+
+        validator1.setProposalInfo(PROPOSAL_ID, minerAddresses);
+
+        validator1.commitScores();
+
+        _increaseTimeBy(VALIDATOR_COMMIT_PERIOD);
+
+        address[] memory minerAddresses2 = new address[](1);
+        minerAddresses[0] = validator1.addr(); // @dev we set a different address so the hash changes
+
+        validator1.setProposalInfo(PROPOSAL_ID, minerAddresses2);
+
+        bytes memory bytesError = abi.encodeWithSelector(InvalidTopMinerProposal.selector, validator1.addr());
+
+        vm.expectRevert(bytesError);
+
+        validator1.revealScores();
+    }
+
+    // Execute tests
+
+    function test_execute_with_invalid_source_address_reverts() public {
+        EarthMindConsensus.Request memory request =
+            EarthMindConsensus.Request({sender: protocol1.addr(), proposalId: PROPOSAL_ID});
+
+        bytes memory payload = abi.encode(request);
+
+        bytes32 commandId = keccak256(payload);
+        string memory sourceAddress = miner1.addr().toString();
+
+        vm.startPrank(protocol1.addr());
+
+        vm.expectRevert(InvalidSourceAddress.selector);
+
+        earthMindConsensusInstance.execute(commandId, config.sourceChain, sourceAddress, payload);
+    }
+
+    function test_execute_with_invalid_source_chain_reverts() public {
+        EarthMindConsensus.Request memory request =
+            EarthMindConsensus.Request({sender: protocol1.addr(), proposalId: PROPOSAL_ID});
+
+        bytes memory payload = abi.encode(request);
+
+        bytes32 commandId = keccak256(payload);
+        string memory sourceAddress = protocol1.addr().toString();
+        string memory wrongSourceChain = "2";
+        vm.startPrank(protocol1.addr());
+
+        vm.expectRevert(InvalidSourceChain.selector);
+
+        earthMindConsensusInstance.execute(commandId, wrongSourceChain, sourceAddress, payload);
+    }
+
+    // Helper functions
     function _requestGovernanceDecision() internal {
         EarthMindConsensus.Request memory request =
             EarthMindConsensus.Request({sender: protocol1.addr(), proposalId: PROPOSAL_ID});
@@ -240,7 +488,6 @@ contract EarthMindConsensusTest is BaseConsensusTest {
 
         vm.startPrank(protocol1.addr());
 
-        // @dev since we are using a single cross chain setup, the source chain is the destination chain
-        earthMindConsensusInstance.execute(commandId, config.destinationChain, protocol1.addr().toString(), payload);
+        earthMindConsensusInstance.execute(commandId, config.sourceChain, protocol1.addr().toString(), payload);
     }
 }

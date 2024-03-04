@@ -195,9 +195,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit ValidatorUnregistered(validator1.addr());
 
-        earthMindRegistryL1.execute(
-            commandId, config.destinationChain, address(earthMindRegistryL2).toString(), payload
-        );
+        earthMindRegistryL1.execute(commandId, config.sourceChain, address(earthMindRegistryL2).toString(), payload);
     }
 
     function test_validatorUnregister_whenL2Messages_sourceAddress_is_wrong_reverts() public {
@@ -209,9 +207,7 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         vm.expectRevert(InvalidSourceAddress.selector);
 
-        earthMindRegistryL1.execute(
-            commandId, config.destinationChain, address(earthMindRegistryL1).toString(), payload
-        );
+        earthMindRegistryL1.execute(commandId, config.sourceChain, address(earthMindRegistryL1).toString(), payload);
     }
 
     function test_validatorUnregister_whenL2Messages_sourceChain_is_wrong_reverts() public {
@@ -237,8 +233,6 @@ contract EarthMindRegistryL1Test is BaseRegistryTest {
 
         emit MinerUnregistered(miner1.addr());
 
-        earthMindRegistryL1.execute(
-            commandId, config.destinationChain, address(earthMindRegistryL2).toString(), payload
-        );
+        earthMindRegistryL1.execute(commandId, config.sourceChain, address(earthMindRegistryL2).toString(), payload);
     }
 }
