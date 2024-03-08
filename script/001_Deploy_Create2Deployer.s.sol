@@ -2,7 +2,6 @@
 pragma solidity 0.8.19;
 
 import {Create2Deployer} from "@contracts/utils/Create2Deployer.sol";
-import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 import {Constants} from "@constants/Constants.sol";
 import {BaseScript} from "./000_BaseScript.s.sol";
