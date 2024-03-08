@@ -27,7 +27,10 @@ deploy_registry_l2 NETWORK_ID JSON_RPC_URL:
 
 deploy_consensus NETWORK_ID JSON_RPC_URL:
     forge script script/005_Deploy_Consensus.s.sol:DeployConsensusScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
-    
+
+deploy_message_relayer NETWORK_ID JSON_RPC_URL:
+    forge script script/006_Deploy_MessageRelayer.s.sol:DeployMessageRelayerScript --rpc-url $JSON_RPC_URL --chain-id $NETWORK_ID --sender $SENDER --broadcast --ffi -vvvv
+
 deploy_local_contracts:
     echo "Deploying contracts locally"
     just deploy_create2_deployer $CHAIN1_ID $CHAIN1_URL # L1
@@ -39,6 +42,7 @@ deploy_local_contracts:
     just deploy_registry $L1 $CHAIN1_ID $CHAIN1_URL # L1
     just deploy_registry $L2 $CHAIN2_ID $CHAIN2_URL # L2
     just deploy_consensus $CHAIN2_ID $CHAIN2_URL # L2
+    just deploy_message_relayer $CHAIN1_ID $CHAIN1_URL # L1
 
 # orchestration and testing
 test_unit:
@@ -53,7 +57,7 @@ test_coverage:
 test_integration skip="false":
     echo "Running integration tests"
     {{ if skip == "skip-deploy" { "echo Skipping deployment" } else { "just deploy_local_contracts" } }}
-    forge test --match-path "*/integration/*.sol" -vvvv
+    forge test --match-path "*/integration/*.t.sol" -vvv
 
 test CONTRACT:
     NETWORK_ID=3137 forge test --mc {{CONTRACT}} -vvvv
