@@ -32,6 +32,8 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
 
     EarthMindRegistryL2 public registry;
 
+    uint256 public MAX_MINERS_PER_VALIDATOR_PROPOSAL = 10;
+
     struct MinerProposal {
         bytes32 proposalHash;
         bool isRevealed;
@@ -39,10 +41,15 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         string message; // @improve: Remove this from the struct and just emit it in the event
     }
 
-    struct TopMinersProposal {
+    struct ValidatorProposal {
         bytes32 topMinersProposalHash;
         bool isRevealed;
         address[] minerAddresses;
+    }
+
+    struct MinerScore {
+        address miner;
+        uint256 score;
     }
 
     struct Request {
@@ -51,18 +58,18 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
     }
 
     mapping(uint256 epoch => mapping(address => MinerProposal)) public minerProposals;
-    mapping(uint256 epoch => mapping(address => TopMinersProposal)) public validatorProposals;
+    mapping(uint256 epoch => mapping(address => ValidatorProposal)) public validatorProposals;
+    mapping(address miner => uint256 rewardsBalance) public rewardsBalance; // TODO Give rewards when win during epoch
+    mapping(uint256 epoch => mapping(address miner => uint256 score)) public validatorsScores;
+    mapping(uint256 epoch => address[] minersAddresses) public epochMinerAddressesScored; // Mapping from epoch to an array of miner addresses for enumeration
+    mapping(uint256 epoch => uint256 lastIndex) public lastProcessedIndex;
+    mapping(uint256 epoch => MinerScore[10] topMiners) public epochTopMiners; // Tracks the top 10 miners for each epoch
 
-    // TODO Give rewards when win during epoch
-    mapping(address miner => uint256 rewardsBalance) public rewardsBalance;
-
-    event ProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
-    event ProposalRevealed(uint256 indexed epoch, address indexed miner, bool vote, string message);
-    event TopMinersProposalCommitted(uint256 indexed epoch, address indexed validator, bytes32 scoreHash);
-    event TopMinersProposalRevealed(uint256 indexed epoch, address indexed validator, address[] minerAddresses);
-
-    // L1 Governance Requests
-    event RequestReceived(uint256 indexed epoch, address indexed sender, bytes32 message);
+    event MinerProposalCommitted(uint256 indexed epoch, address indexed miner, bytes32 proposalHash);
+    event MinerProposalRevealed(uint256 indexed epoch, address indexed miner, bool vote, string message);
+    event ValidatorProposalCommitted(uint256 indexed epoch, address indexed validator, bytes32 scoreHash);
+    event ValidatorProposalRevealed(uint256 indexed epoch, address indexed validator, address[] minerAddresses);
+    event RequestReceived(uint256 indexed epoch, address indexed sender, bytes32 message); // L1 Governance Requests
 
     constructor(address _registryL2, address _gateway, address _gasService) AxelarExecutable(_gateway) {
         gasReceiver = IAxelarGasService(_gasService);
@@ -84,7 +91,7 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
 
         proposal.proposalHash = _proposalHash;
 
-        emit ProposalCommitted(_epoch, msg.sender, _proposalHash);
+        emit MinerProposalCommitted(_epoch, msg.sender, _proposalHash);
     }
 
     function revealProposal(uint256 _epoch, bool _vote, string calldata _message)
@@ -108,9 +115,12 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
             revert InvalidProposal(msg.sender);
         }
 
-        proposal.isRevealed = true;
         // store the vote
-        emit ProposalRevealed(_epoch, msg.sender, _vote, _message);
+        proposal.isRevealed = true;
+        proposal.vote = _vote;
+        proposal.message = _message;
+
+        emit MinerProposalRevealed(_epoch, msg.sender, _vote, _message);
     }
 
     // Validator Operations
@@ -119,14 +129,14 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         onlyValidators
         atStage(_epoch, Stage.CommitValidators)
     {
-        TopMinersProposal storage topMinerProposal = validatorProposals[_epoch][msg.sender];
+        ValidatorProposal storage topMinerProposal = validatorProposals[_epoch][msg.sender];
         if (topMinerProposal.topMinersProposalHash != 0) {
             revert TopMinerProposalAlreadyCommitted(msg.sender);
         }
 
         topMinerProposal.topMinersProposalHash = _topMinersProposalHash;
 
-        emit TopMinersProposalCommitted(_epoch, msg.sender, _topMinersProposalHash);
+        emit ValidatorProposalCommitted(_epoch, msg.sender, _topMinersProposalHash);
     }
 
     function revealScores(uint256 _epoch, address[] calldata _minerAddresses)
@@ -134,11 +144,12 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
         onlyValidators
         atStage(_epoch, Stage.RevealValidators)
     {
-        // TODO: duplicated miners
+        _validateNonEmptyArray(_minerAddresses);
+        _validateArrayLength(_minerAddresses);
+        _validateDuplicates(_minerAddresses);
+        _validateAddresses(_minerAddresses);
 
-        // TODO: How do we know validators are passing miner addresses that are actually miners?
-        // Maybe a merkle tree of miner addresses?
-        TopMinersProposal storage topMinerProposal = validatorProposals[_epoch][msg.sender];
+        ValidatorProposal storage topMinerProposal = validatorProposals[_epoch][msg.sender];
 
         if (topMinerProposal.isRevealed) {
             revert TopMinerProposalAlreadyRevealed(msg.sender);
@@ -154,16 +165,103 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
             revert InvalidTopMinerProposal(msg.sender);
         }
 
+        // store validator proposal
         topMinerProposal.isRevealed = true;
         topMinerProposal.minerAddresses = _minerAddresses;
 
-        emit TopMinersProposalRevealed(_epoch, msg.sender, _minerAddresses);
+        _addScores(_epoch, _minerAddresses);
 
-        // structure => epoch => miner => score
-        // As validators are revealing their scores, we add the scores for each miner...
+        emit ValidatorProposalRevealed(_epoch, msg.sender, _minerAddresses);
+    }
+
+    function aggregateScoresAndPropagateDecision(uint256 _epoch, uint256 _start, uint256 _end) external {
+        // TODO Have a way to know the epoch is finalized
+
+        require(_start <= _end, "Invalid range.");
+        require(_end < epochMinerAddressesScored[_epoch].length, "End index out of bounds.");
+
+        // Ensure _start is greater than the last processed index to avoid re-processing
+        uint256 processedUntil = lastProcessedIndex[_epoch];
+        require(
+            _start > processedUntil,
+            "Start index should be greater than the last processed index or equal to process from the beginning."
+        );
+
+        for (uint256 i = _start; i <= _end; i++) {
+            address miner = epochMinerAddressesScored[_epoch][i];
+            uint256 score = validatorsScores[_epoch][miner];
+            _insertInOrder(_epoch, miner, score);
+        }
+
+        lastProcessedIndex[_epoch] = _end; // Update to the last processed index correctly
+
+        // Further logic to utilize or propagate top miners...
     }
 
     // Internal Functions
+    function _insertInOrder(uint256 _epoch, address miner, uint256 score) internal {
+        MinerScore[10] storage topMiners = epochTopMiners[_epoch];
+        MinerScore memory newMinerScore = MinerScore(miner, score);
+
+        int256 insertPos = -1;
+        for (uint256 i = 0; i < 10; i++) {
+            if (topMiners[i].miner == address(0) || topMiners[i].score < score) {
+                insertPos = int256(i);
+                break;
+            }
+        }
+
+        if (insertPos != -1) {
+            for (int256 i = 8; i >= insertPos; i--) {
+                topMiners[uint256(i + 1)] = topMiners[uint256(i)];
+            }
+            topMiners[uint256(insertPos)] = newMinerScore;
+        }
+    }
+
+    function _addOrUpdateScore(uint256 _epoch, address _miner) internal {
+        if (validatorsScores[_epoch][_miner] == 0) {
+            // New score for this miner in this epoch, add miner address to array for tracking
+            epochMinerAddressesScored[_epoch].push(_miner);
+        }
+
+        validatorsScores[_epoch][_miner] += 1;
+    }
+
+    function _addScores(uint256 _epoch, address[] calldata _minerAddresses) internal {
+        for (uint256 i = 0; i < _minerAddresses.length; i++) {
+            _addOrUpdateScore(_epoch, _minerAddresses[i]);
+        }
+    }
+
+    function _validateNonEmptyArray(address[] calldata _minerAddresses) internal view {
+        if (_minerAddresses.length == 0) {
+            revert InvalidTopMinerProposal(msg.sender);
+        }
+    }
+
+    function _validateArrayLength(address[] calldata _minerAddresses) internal view {
+        if (_minerAddresses.length > MAX_MINERS_PER_VALIDATOR_PROPOSAL) {
+            revert InvalidTopMinerProposal(msg.sender);
+        }
+    }
+
+    function _validateDuplicates(address[] calldata _minerAddresses) internal pure {
+        for (uint256 i = 0; i < _minerAddresses.length; i++) {
+            for (uint256 j = i + 1; j < _minerAddresses.length; j++) {
+                require(_minerAddresses[i] != _minerAddresses[j], "Duplicate address detected");
+            }
+        }
+    }
+
+    function _validateAddresses(address[] calldata _minerAddresses) internal view {
+        for (uint256 i = 0; i < _minerAddresses.length; i++) {
+            if (!registry.miners(_minerAddresses[i])) {
+                revert InvalidMiner(_minerAddresses[i]);
+            }
+        }
+    }
+
     function _requestGovernanceDecision(bytes memory _payload) internal {
         totalEpochs++;
         Request memory request = abi.decode(_payload, (Request));
@@ -205,14 +303,6 @@ contract EarthMindConsensus is TimeBasedEpochs, AxelarExecutable {
 
     function _isValidSourceChain(string calldata sourceChain) internal view returns (bool) {
         return keccak256(abi.encodePacked(sourceChain)) == keccak256(abi.encodePacked(registry.DESTINATION_CHAIN()));
-    }
-
-    function aggregateAndPropagateDecisionFromValidatorXToY(uint256 _hint) external {
-        // We have all scores
-
-        // Take the top 10 miners
-
-        // Propagate the decision result (all using Axelar)
     }
 
     // Modifiers

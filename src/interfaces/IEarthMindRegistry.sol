@@ -13,4 +13,6 @@ interface IEarthMindRegistry {
     event ValidatorRegistered(address indexed Validator);
 
     event ValidatorUnregistered(address indexed Validator);
+
+    function protocols(address protocol) external view returns (bool);
 }

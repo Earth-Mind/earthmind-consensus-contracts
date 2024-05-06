@@ -44,3 +44,5 @@ error TopMinerProposalNotCommitted(address validator);
 error EpochEnded();
 
 error InvalidSetupData();
+
+error ProtocolNotWhitelisted();

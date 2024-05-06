@@ -479,15 +479,6 @@ contract EarthMindConsensusTest is BaseConsensusTest {
 
     // Helper functions
     function _requestGovernanceDecision() internal {
-        EarthMindConsensus.Request memory request =
-            EarthMindConsensus.Request({sender: protocol1.addr(), proposalId: PROPOSAL_ID});
-
-        bytes memory payload = abi.encode(request);
-
-        bytes32 commandId = keccak256(payload);
-
-        vm.startPrank(protocol1.addr());
-
-        earthMindConsensusInstance.execute(commandId, config.sourceChain, protocol1.addr().toString(), payload);
+        protocol1.requestGovernanceDecision();
     }
 }

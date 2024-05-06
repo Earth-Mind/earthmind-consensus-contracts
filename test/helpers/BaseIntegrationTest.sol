@@ -6,9 +6,9 @@ import {EarthMindRegistryL2} from "@contracts/EarthMindRegistryL2.sol";
 import {EarthMindConsensus} from "@contracts/EarthMindConsensus.sol";
 import {MockGateway} from "@contracts/mocks/MockGateway.sol";
 
-import {Configuration} from "@config/Configuration.sol";
 import {DeploymentUtils} from "@utils/DeploymentUtils.sol";
 import {Constants} from "@constants/Constants.sol";
+import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 
 import {BaseTest} from "./BaseTest.sol";
 
@@ -21,6 +21,7 @@ import {Vm} from "forge-std/Vm.sol";
 
 contract BaseIntegrationTest is BaseTest {
     using DeploymentUtils for Vm;
+    using AddressUtils for address;
 
     // Instances
     MockGateway internal mockGatewayL1;
@@ -71,41 +72,71 @@ contract BaseIntegrationTest is BaseTest {
     }
 
     function _setupAccounts() internal virtual {
-        Validator validator1 = new Validator(BaseAccount.AccountParams({
-            name: "validator_1",
-            vm: vm,
-            forkMode: true,
-            l1Network: networkL1,
-            l2Network: networkL2,
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: earthMindConsensus
-        }));
+        Validator validator1 = new Validator(
+            BaseAccount.AccountParams({
+                name: "validator_1",
+                vm: vm,
+                forkMode: true,
+                l1Network: networkL1,
+                l2Network: networkL2,
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: earthMindConsensus
+            })
+        );
 
-        Miner miner1 = new Miner(BaseAccount.AccountParams({
-            name: "miner_1",
-            vm: vm,
-            forkMode: true,
-            l1Network: networkL1,
-            l2Network: networkL2,
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: earthMindConsensus
-        }));
+        Miner miner1 = new Miner(
+            BaseAccount.AccountParams({
+                name: "miner_1",
+                vm: vm,
+                forkMode: true,
+                l1Network: networkL1,
+                l2Network: networkL2,
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: earthMindConsensus
+            })
+        );
 
-        Protocol protocol1 = new Protocol(BaseAccount.AccountParams({
-            name: "protocol_1",
-            vm: vm,
-            forkMode: true,
-            l1Network: networkL1,
-            l2Network: networkL2,
-            earthMindRegistryL1Instance: earthMindRegistryL1,
-            earthMindRegistryL2Instance: earthMindRegistryL2,
-            earthMindConsensusInstance: earthMindConsensus
-        }));
+        Protocol protocol1 = new Protocol(
+            BaseAccount.AccountParams({
+                name: "protocol_1",
+                vm: vm,
+                forkMode: true,
+                l1Network: networkL1,
+                l2Network: networkL2,
+                earthMindRegistryL1Instance: earthMindRegistryL1,
+                earthMindRegistryL2Instance: earthMindRegistryL2,
+                earthMindConsensusInstance: earthMindConsensus
+            })
+        );
 
         validators.push(validator1);
         miners.push(miner1);
         protocols.push(protocol1);
+    }
+
+    function _bridgeFromL1ToL2(bytes32 _commandId) internal {
+        vm.selectFork(networkL1);
+
+        MockGateway.ContractCallParams memory lastcall = mockGatewayL1.getLastContractCall();
+
+        vm.selectFork(networkL2);
+
+        earthMindRegistryL2.execute(
+            _commandId, Constants.LOCAL_L1_NETWORK, address(earthMindRegistryL1).toString(), lastcall.payload
+        );
+    }
+
+    function _bridgeFromL2ToL1(bytes32 _commandId) internal {
+        vm.selectFork(networkL2);
+
+        MockGateway.ContractCallParams memory lastcall = mockGatewayL2.getLastContractCall();
+
+        vm.selectFork(networkL1);
+
+        earthMindRegistryL1.execute(
+            _commandId, Constants.LOCAL_L2_NETWORK, address(earthMindRegistryL2).toString(), lastcall.payload
+        );
     }
 }

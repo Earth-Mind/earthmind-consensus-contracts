@@ -16,14 +16,6 @@ contract BaseScript is Script {
 
     bool private SKIP_LOAD_CONFIG_FROM_DISK = false;
 
-    struct Deployment {
-        string name;
-        address addr;
-    }
-
-    string internal deploymentsPath;
-    string internal folderPath;
-
     constructor() {
         string memory networkId = vm.envString("NETWORK_ID");
 
@@ -32,12 +24,6 @@ contract BaseScript is Script {
         }
 
         deployer = vm.loadDeployerAddress();
-
-        // setup paths
-        string memory root = vm.projectRoot();
-        deploymentsPath = string.concat(root, "/deployments/");
-
-        folderPath = string.concat(deploymentsPath, networkId);
     }
 
     function _skipLoadConfig() internal view virtual returns (bool) {

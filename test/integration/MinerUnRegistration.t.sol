@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+import {MockGateway} from "@contracts/mocks/MockGateway.sol";
+import {AddressUtils} from "@contracts/libraries/AddressUtils.sol";
 import {Constants} from "@constants/Constants.sol";
 
 import {BaseIntegrationTest} from "../helpers/BaseIntegrationTest.sol";
@@ -8,7 +10,9 @@ import {Miner} from "../helpers/Miner.sol";
 
 import {console2} from "forge-std/console2.sol";
 
-contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
+contract MinerUnRegistrationIntegrationTest is BaseIntegrationTest {
+    using AddressUtils for address;
+
     Miner internal miner1;
 
     function setUp() public {
@@ -21,7 +25,7 @@ contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
         miner1 = miners[0];
     }
 
-    function test_MinerRegister() public {
+    function test_MinerUnRegister() public {
         address minerAddress = miner1.addr();
 
         miner1.registerMiner{value: 1 ether}();
@@ -35,5 +39,7 @@ contract MinerRegistrationIntegrationTest is BaseIntegrationTest {
         bool isRegistered = earthMindRegistryL2.miners(minerAddress);
 
         assertTrue(isRegistered, "Miner is not registered");
+
+        // miner1.unRegisterMiner();
     }
 }
